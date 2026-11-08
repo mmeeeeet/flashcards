@@ -137,6 +137,52 @@
     -webkit-background-clip:text; background-clip:text; color:transparent;}
   .counts .k{font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:var(--cream-faint); margin-top:5px;}
 
+  /* ————— drill: slim header + compact bottom stats ————— */
+  #screen-drill{display:flex; flex-direction:column; min-height:calc(100dvh - 84px);}
+  .drill-top{
+    display:flex; justify-content:space-between; align-items:center; gap:12px;
+    padding:12px 0 9px; border-bottom:1px solid var(--hair);
+  }
+  .drill-top-left{display:flex; flex-direction:column; gap:2px; min-width:0;}
+  #drill-title{
+    font-family:var(--disp); font-weight:600; font-size:19px; letter-spacing:.07em;
+    text-transform:uppercase; line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .drill-dateline-inline{
+    color:var(--red); font-size:10px; letter-spacing:.18em; text-transform:uppercase; font-weight:600;
+  }
+  #drill-quit{
+    background:none; border:1px solid var(--hair); color:var(--cream-dim);
+    font-size:10px; letter-spacing:.14em; text-transform:uppercase; padding:8px 10px; flex-shrink:0;
+  }
+  #drill-quit:active{color:var(--cream); border-color:var(--cream);}
+  .counts-bottom{
+    margin-top:auto; border-top:1px solid var(--hair-soft); border-bottom:none;
+    padding-top:2px;
+  }
+  .counts-bottom div{padding:7px 2px 4px;}
+  .counts-bottom .v{font-size:17px;}
+  .counts-bottom .k{font-size:8px; letter-spacing:.12em; margin-top:3px;}
+  #screen-drill .card{
+    margin-top:12px; min-height:0; padding:16px 4px 14px; justify-content:flex-start;
+  }
+  #screen-drill .card .dir{margin-bottom:9px;}
+  #screen-drill .card .front{font-size:26px; line-height:1.25;}
+  #screen-drill .card .front.small{font-size:21px;}
+  #screen-drill .card .hint{margin-top:8px; font-size:11px;}
+  #screen-drill .card .back{margin-top:14px; padding-top:12px;}
+  #screen-drill .card .answer{font-size:23px;}
+  #screen-drill .card .meaning{font-size:17px;}
+  #screen-drill .card .ex{margin-top:10px; font-size:14px;}
+  #screen-drill .card .yours{margin-top:8px; font-size:13px;}
+  #screen-drill .answer-zone{margin-top:14px;}
+  #screen-drill .judge-banner{margin-top:14px; padding:10px 10px 8px; font-size:20px;}
+  #screen-drill .judge-banner small{margin-top:4px; font-size:11px;}
+  #screen-drill .opt{padding:11px 12px; font-size:15px;}
+  #screen-drill .options{gap:6px;}
+  #screen-drill .next-btn{margin-top:12px; padding:15px 10px 12px; font-size:19px;}
+  #screen-drill .pass-note{margin-top:14px; padding-top:14px;}
+
   .card{
     margin-top:22px; border-top:1px solid var(--hair); border-bottom:1px solid var(--hair);
     min-height:320px; display:flex; flex-direction:column; justify-content:center;
@@ -304,17 +350,12 @@
 
   <!-- ══════════ DRILL ══════════ -->
   <section id="screen-drill" class="hidden">
-    <div class="screen-head">
-      <div class="screen-label" id="drill-dateline">—</div>
-      <h2 class="screen-title" id="drill-title">French — Level 1</h2>
-      <button class="back-btn" id="drill-quit">← Stop this loop</button>
-    </div>
-    <div class="counts">
-      <div><div class="v" id="c-left">–</div><div class="k">Cards left</div></div>
-      <div><div class="v" id="c-miss">0</div><div class="k">Misses this loop</div></div>
-      <div><div class="v" id="c-accent">0</div><div class="k">Accent misses</div></div>
-      <div><div class="v" id="c-loop">1</div><div class="k">Loop</div></div>
-      <div><div class="v" id="c-size">–</div><div class="k">In level</div></div>
+    <div class="drill-top">
+      <div class="drill-top-left">
+        <div id="drill-title">French — Level 1</div>
+        <div class="drill-dateline-inline" id="drill-dateline">—</div>
+      </div>
+      <button id="drill-quit" type="button">Stop</button>
     </div>
 
     <div id="drill-live">
@@ -358,6 +399,14 @@
         <button class="plain-btn" id="end-primary">Run it again</button>
         <button class="ghost-btn" id="end-home">Back to decks</button>
       </div>
+    </div>
+
+    <div class="counts counts-bottom" aria-label="Loop stats">
+      <div><div class="v" id="c-left">–</div><div class="k">Left</div></div>
+      <div><div class="v" id="c-miss">0</div><div class="k">Misses</div></div>
+      <div><div class="v" id="c-accent">0</div><div class="k">Accent</div></div>
+      <div><div class="v" id="c-loop">1</div><div class="k">Loop</div></div>
+      <div><div class="v" id="c-size">–</div><div class="k">In level</div></div>
     </div>
   </section>
 
