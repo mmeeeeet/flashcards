@@ -1,0 +1,1170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="dark" />
+<meta name="theme-color" content="#000000" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<meta name="apple-mobile-web-app-title" content="Flashcards" />
+<link rel="icon" href="data:," />
+<title>Flashcards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500;1,600&family=IBM+Plex+Mono:wght@400;500;600&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --black:#000000;
+    --cream:#F2EDE3;
+    --cream-dim:rgba(242,237,227,.55);
+    --cream-faint:rgba(242,237,227,.32);
+    --hair:rgba(242,237,227,.16);
+    --hair-soft:rgba(242,237,227,.09);
+    --red:#C8102E;
+    --ox1:#6E1420;
+    --ox2:#9E1B30;
+    --mono:'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    --disp:'Oswald', 'Arial Narrow', sans-serif;
+    --serif:'Cormorant Garamond', Georgia, serif;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{background:var(--black);}
+  body{
+    margin:0; color:var(--cream); font-family:var(--mono);
+    font-size:15px; line-height:1.55;
+    padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+  }
+  .wrap{max-width:560px; margin:0 auto; padding:0 20px 56px;}
+  button{font-family:var(--mono); cursor:pointer;}
+  .hidden{display:none !important;}
+
+  /* ————— top line ————— */
+  .topline{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:16px 0 12px; border-bottom:1px solid var(--hair);
+  }
+  .dateline{
+    color:var(--red); font-size:11px; letter-spacing:.22em;
+    text-transform:uppercase; font-weight:600;
+  }
+  .toplinks{display:flex; gap:18px;}
+  .toplinks button{
+    background:none; border:none; color:var(--cream-dim);
+    font-size:11px; letter-spacing:.18em; text-transform:uppercase; padding:6px 0;
+  }
+  .toplinks button:active{color:var(--cream);}
+
+  .motto{
+    font-family:var(--serif); font-style:italic; font-weight:500;
+    font-size:21px; color:var(--cream); text-align:center;
+    margin:26px 0 4px; letter-spacing:.01em;
+  }
+  .motto-sub{
+    text-align:center; color:var(--cream-faint); font-size:11px;
+    letter-spacing:.2em; text-transform:uppercase; margin-bottom:8px;
+  }
+  .bouquet{display:flex; justify-content:center; margin:14px 0 2px;}
+
+  /* ————— deck sections ————— */
+  .deck{border-top:1px solid var(--hair); margin-top:30px; padding-top:22px;}
+  .deck-head{display:flex; justify-content:space-between; align-items:flex-end; gap:12px;}
+  .deck-name{
+    font-family:var(--disp); font-weight:600; font-size:44px; line-height:1;
+    text-transform:uppercase; letter-spacing:.02em; margin:0;
+  }
+  .deck-words{color:var(--cream-dim); font-size:12px; letter-spacing:.14em; text-transform:uppercase; white-space:nowrap; padding-bottom:5px;}
+  .deck-stats{display:flex; align-items:baseline; gap:14px; margin-top:16px;}
+  .big-figure{
+    font-family:var(--disp); font-weight:700; font-size:76px; line-height:.95;
+    background:linear-gradient(160deg, var(--ox2) 10%, var(--ox1) 90%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .deck-stats .stat-label{color:var(--cream-dim); font-size:12px; letter-spacing:.12em; text-transform:uppercase; line-height:1.7;}
+  .deck-stats .stat-label b{color:var(--cream); font-weight:600;}
+
+  .level-grid{
+    display:grid; grid-template-columns:repeat(5, 1fr); gap:1px;
+    background:var(--hair-soft); border:1px solid var(--hair-soft); margin-top:20px;
+  }
+  .lvl{
+    background:var(--black); border:none; color:var(--cream);
+    padding:13px 2px 10px; text-align:center; position:relative; min-height:64px;
+  }
+  .lvl .n{font-family:var(--disp); font-weight:600; font-size:24px; line-height:1; display:block;}
+  .lvl .c{font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:var(--cream-faint); display:block; margin-top:5px;}
+  .lvl.locked{color:var(--cream-faint);}
+  .lvl.locked .n{opacity:.38;}
+  .lvl.current .n{color:var(--red);}
+  .lvl.mastered{background:var(--cream); color:#000;}
+  .lvl.mastered .c{color:rgba(0,0,0,.55);}
+  .lvl.mastered::after{
+    content:""; position:absolute; top:6px; right:7px; width:7px; height:7px;
+    border-radius:50%; background:var(--red);
+  }
+  .lvl:not(.locked):active{opacity:.75;}
+
+  .drill-btn{
+    width:100%; margin-top:22px; background:var(--cream); color:#000; border:none;
+    font-family:var(--disp); font-weight:600; font-size:24px; letter-spacing:.14em;
+    text-transform:uppercase; padding:19px 10px 16px;
+  }
+  .drill-btn small{display:block; font-family:var(--mono); font-weight:400; font-size:11px; letter-spacing:.16em; margin-top:5px; color:rgba(0,0,0,.6); text-transform:uppercase;}
+  .drill-btn:active{opacity:.85;}
+  .deck-done{
+    margin-top:22px; border-top:1px solid var(--hair); padding-top:14px;
+    color:var(--cream-dim); font-size:13px;
+  }
+  .deck-done b{color:var(--cream);}
+
+  /* ————— drill screen ————— */
+  .screen-head{padding-top:20px;}
+  .screen-label{color:var(--red); font-size:11px; letter-spacing:.22em; text-transform:uppercase; font-weight:600;}
+  .screen-title{font-family:var(--disp); font-weight:600; font-size:38px; text-transform:uppercase; line-height:1.05; margin:8px 0 0;}
+  .back-btn{
+    background:none; border:none; color:var(--cream-dim); font-size:12px;
+    letter-spacing:.18em; text-transform:uppercase; padding:10px 0; margin-top:6px;
+  }
+  .counts{
+    display:flex; gap:0; border-top:1px solid var(--hair); border-bottom:1px solid var(--hair);
+    margin-top:18px;
+  }
+  .counts div{flex:1; padding:10px 4px; text-align:center;}
+  .counts div + div{border-left:1px solid var(--hair-soft);}
+  .counts .v{font-family:var(--disp); font-weight:600; font-size:26px; line-height:1;
+    background:linear-gradient(160deg, var(--ox2), var(--ox1));
+    -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .counts .k{font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:var(--cream-faint); margin-top:5px;}
+
+  .card{
+    margin-top:22px; border-top:1px solid var(--hair); border-bottom:1px solid var(--hair);
+    min-height:320px; display:flex; flex-direction:column; justify-content:center;
+    padding:30px 6px; text-align:center; user-select:none; cursor:pointer;
+  }
+  .card .dir{color:var(--red); font-size:10px; letter-spacing:.24em; text-transform:uppercase; font-weight:600; margin-bottom:18px;}
+  .card .front{font-size:30px; font-weight:600; line-height:1.3; word-break:break-word;}
+  .card .front.small{font-size:23px;}
+  .card .hint{color:var(--cream-faint); font-size:12px; margin-top:16px; letter-spacing:.08em;}
+  .card .back{margin-top:26px; border-top:1px solid var(--hair-soft); padding-top:22px;}
+  .card .answer{font-size:27px; font-weight:600; line-height:1.3;}
+  .card .answer .forms{display:block; font-size:20px; color:var(--cream-dim); margin-top:6px; font-weight:400;}
+  .card .meaning{font-size:19px; margin-top:4px;}
+  .card .ex{margin-top:20px; font-size:15px; color:var(--cream);}
+  .card .gloss{margin-top:5px; font-size:13px; color:var(--cream-dim); font-style:normal;}
+  .tap-note{color:var(--cream-faint); font-size:11px; letter-spacing:.18em; text-transform:uppercase; margin-top:22px;}
+
+  .verdict{display:flex; gap:1px; background:var(--hair-soft); border:1px solid var(--hair-soft); margin-top:20px;}
+  .verdict button{flex:1; border:none; padding:20px 8px 17px; font-family:var(--disp); font-weight:600; font-size:21px; letter-spacing:.12em; text-transform:uppercase;}
+  .btn-knew{background:var(--cream); color:#000;}
+  .btn-missed{background:var(--black); color:var(--cream);}
+  .btn-missed span{color:var(--red);}
+  .verdict button:active{opacity:.8;}
+
+  .pass-note{
+    margin-top:22px; border-top:1px solid var(--hair); padding-top:18px; text-align:center;
+  }
+  .pass-note .big{font-family:var(--disp); font-size:30px; font-weight:600; text-transform:uppercase;}
+  .pass-note p{color:var(--cream-dim); font-size:13px; margin:10px 0 18px;}
+  .plain-btn{
+    background:var(--cream); color:#000; border:none; width:100%;
+    font-family:var(--disp); font-weight:600; font-size:20px; letter-spacing:.12em;
+    text-transform:uppercase; padding:17px 10px 14px;
+  }
+  .ghost-btn{
+    background:none; color:var(--cream-dim); border:1px solid var(--hair); width:100%;
+    font-size:12px; letter-spacing:.16em; text-transform:uppercase; padding:15px 10px; margin-top:10px;
+  }
+
+  /* ————— forms ————— */
+  form{margin-top:24px;}
+  .field{margin-bottom:20px;}
+  .field label{display:block; color:var(--red); font-size:10px; letter-spacing:.22em; text-transform:uppercase; font-weight:600; margin-bottom:8px;}
+  .field input, .field select, .field textarea{
+    width:100%; background:var(--black); border:none; border-bottom:1px solid var(--hair);
+    color:var(--cream); font-family:var(--mono); font-size:17px; padding:10px 2px; border-radius:0;
+    appearance:none; -webkit-appearance:none;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{outline:none; border-bottom-color:var(--cream);}
+  .field .note{color:var(--cream-faint); font-size:11px; margin-top:6px;}
+  .form-msg{margin-top:16px; font-size:13px; color:var(--cream-dim); min-height:20px;}
+  .form-msg b{color:var(--cream);}
+
+  .setting-row{border-top:1px solid var(--hair); padding:20px 0;}
+  .setting-row h3{margin:0 0 6px; font-size:15px; font-weight:600;}
+  .setting-row p{margin:0 0 14px; color:var(--cream-dim); font-size:13px;}
+  .danger-btn{
+    background:none; border:1px solid var(--red); color:var(--red); width:100%;
+    font-size:13px; letter-spacing:.16em; text-transform:uppercase; padding:16px 10px; font-weight:600;
+  }
+  .confirm-box{border:1px solid var(--red); padding:16px; margin-top:12px;}
+  .confirm-box p{color:var(--cream); margin:0 0 14px;}
+  .confirm-box .row{display:flex; gap:10px;}
+  .confirm-box button{flex:1; padding:14px 6px; font-size:12px; letter-spacing:.14em; text-transform:uppercase;}
+  .confirm-box .yes{background:var(--red); color:#fff; border:none; font-weight:600;}
+  .confirm-box .no{background:none; color:var(--cream-dim); border:1px solid var(--hair);}
+
+  .foot-note{
+    margin-top:44px; border-top:1px solid var(--hair-soft); padding-top:14px;
+    color:var(--cream-faint); font-size:11px; letter-spacing:.06em; text-align:center;
+  }
+  @media (min-width:480px){
+    .level-grid{grid-template-columns:repeat(7, 1fr);}
+    .deck-name{font-size:52px;}
+  }
+  @media (max-width:479px){
+    .deck-name{font-size:31px;}
+    .deck-head{flex-wrap:wrap; row-gap:4px;}
+    .deck-words{padding-bottom:2px;}
+    .big-figure{font-size:60px;}
+    .card .front{font-size:26px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ══════════ HOME ══════════ -->
+  <section id="screen-home">
+    <div class="topline">
+      <div class="dateline" id="dateline">—</div>
+      <div class="toplinks">
+        <button id="nav-add">Add card</button>
+        <button id="nav-settings">Settings</button>
+      </div>
+    </div>
+
+    <div class="bouquet" aria-hidden="true">
+      <svg width="86" height="40" viewBox="0 0 86 40" fill="none">
+        <g stroke="#F2EDE3" stroke-opacity=".45" stroke-width="1">
+          <circle cx="14" cy="12" r="5" fill="#0a0a0a"/><circle cx="23" cy="12" r="5" fill="#0a0a0a"/>
+          <circle cx="18.5" cy="6" r="5" fill="#0a0a0a"/><circle cx="18.5" cy="18" r="5" fill="#0a0a0a"/>
+        </g>
+        <circle cx="18.5" cy="12" r="2.2" fill="#F2EDE3" fill-opacity=".5"/>
+        <path d="M18.5 22 L18.5 38" stroke="#F2EDE3" stroke-opacity=".35"/>
+        <g fill="#C8102E">
+          <circle cx="36" cy="11" r="3.4"/><circle cx="43" cy="6.5" r="3.4"/><circle cx="50" cy="11" r="3.4"/>
+          <circle cx="39.5" cy="16.5" r="3.4"/><circle cx="46.5" cy="16.5" r="3.4"/>
+        </g>
+        <circle cx="43" cy="11.5" r="2.4" fill="#6E1420"/>
+        <path d="M43 20 L43 38" stroke="#C8102E" stroke-opacity=".6"/>
+        <g stroke="#F2EDE3" stroke-opacity=".45" stroke-width="1">
+          <circle cx="63" cy="12" r="5" fill="#0a0a0a"/><circle cx="72" cy="12" r="5" fill="#0a0a0a"/>
+          <circle cx="67.5" cy="6" r="5" fill="#0a0a0a"/><circle cx="67.5" cy="18" r="5" fill="#0a0a0a"/>
+        </g>
+        <circle cx="67.5" cy="12" r="2.2" fill="#F2EDE3" fill-opacity=".5"/>
+        <path d="M67.5 22 L67.5 38" stroke="#F2EDE3" stroke-opacity=".35"/>
+      </svg>
+    </div>
+    <p class="motto">Petit à petit, l'oiseau fait son nid</p>
+    <p class="motto-sub">Little by little, the bird builds its nest</p>
+
+    <div id="deck-fr"></div>
+    <div id="deck-pt"></div>
+
+    <p class="foot-note">A level is mastered only by a full pass with zero misses.<br/>Missed cards come back inside the same loop.</p>
+  </section>
+
+  <!-- ══════════ DRILL ══════════ -->
+  <section id="screen-drill" class="hidden">
+    <div class="screen-head">
+      <div class="screen-label" id="drill-dateline">—</div>
+      <h2 class="screen-title" id="drill-title">French — Level 1</h2>
+      <button class="back-btn" id="drill-quit">← Stop this loop</button>
+    </div>
+    <div class="counts">
+      <div><div class="v" id="c-left">–</div><div class="k">Cards left</div></div>
+      <div><div class="v" id="c-miss">0</div><div class="k">Misses this loop</div></div>
+      <div><div class="v" id="c-loop">1</div><div class="k">Loop</div></div>
+      <div><div class="v" id="c-size">–</div><div class="k">In level</div></div>
+    </div>
+
+    <div id="drill-live">
+      <div class="card" id="card" role="button" tabindex="0" aria-label="Flashcard — tap to reveal the answer">
+        <div class="dir" id="card-dir">Recognition</div>
+        <div class="front" id="card-front">—</div>
+        <div class="hint" id="card-hint"></div>
+        <div class="back hidden" id="card-back">
+          <div class="answer" id="card-answer"></div>
+          <div class="meaning" id="card-meaning"></div>
+          <div class="ex" id="card-ex"></div>
+          <div class="gloss" id="card-gloss"></div>
+        </div>
+        <div class="tap-note" id="tap-note">Tap the card to reveal</div>
+      </div>
+      <div class="verdict hidden" id="verdict">
+        <button class="btn-knew" id="btn-knew">Knew it</button>
+        <button class="btn-missed" id="btn-missed">Missed <span>it</span></button>
+      </div>
+    </div>
+
+    <div id="drill-end" class="hidden">
+      <div class="pass-note">
+        <div class="big" id="end-title">Loop done</div>
+        <p id="end-text"></p>
+        <button class="plain-btn" id="end-primary">Run it again</button>
+        <button class="ghost-btn" id="end-home">Back to decks</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ ADD CARD ══════════ -->
+  <section id="screen-add" class="hidden">
+    <div class="screen-head">
+      <div class="screen-label">New card</div>
+      <h2 class="screen-title">Add a card</h2>
+      <button class="back-btn" data-home>← Back to decks</button>
+    </div>
+    <form id="add-form">
+      <div class="field">
+        <label for="add-deck">Deck</label>
+        <select id="add-deck">
+          <option value="fr">French</option>
+          <option value="pt">Portuguese</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="add-word">Word</label>
+        <input id="add-word" type="text" autocomplete="off" autocapitalize="off" placeholder="le mot / a palavra" />
+        <div class="note">For a noun, write the article with it — le, la, les, l' · o, a, os, as. The article is part of the answer.</div>
+      </div>
+      <div class="field">
+        <label for="add-meaning">English meaning</label>
+        <input id="add-meaning" type="text" autocomplete="off" placeholder="the word" />
+      </div>
+      <div class="field">
+        <label for="add-ex">Example sentence</label>
+        <input id="add-ex" type="text" autocomplete="off" placeholder="Une phrase avec le mot." />
+      </div>
+      <div class="field">
+        <label for="add-gloss">Example in English (optional)</label>
+        <input id="add-gloss" type="text" autocomplete="off" placeholder="A sentence with the word." />
+      </div>
+      <button class="plain-btn" type="submit">Add card</button>
+      <div class="form-msg" id="add-msg"></div>
+    </form>
+  </section>
+
+  <!-- ══════════ SETTINGS ══════════ -->
+  <section id="screen-settings" class="hidden">
+    <div class="screen-head">
+      <div class="screen-label">Settings</div>
+      <h2 class="screen-title">Settings</h2>
+      <button class="back-btn" data-home>← Back to decks</button>
+    </div>
+
+    <div class="setting-row">
+      <h3>Your numbers</h3>
+      <p id="settings-stats">—</p>
+    </div>
+
+    <div class="setting-row">
+      <h3>Take the app with you</h3>
+      <p>This page is the whole app — one file. Download it and it runs anywhere, including as a GitHub Pages site. Cards you added live in this phone's storage, not in the file.</p>
+      <button class="ghost-btn" id="btn-export" style="margin-top:0;">Download this app as one HTML file</button>
+    </div>
+
+    <div class="setting-row">
+      <h3>Reset progress</h3>
+      <p>Clears every mastered level, loop count and first-try record in both decks. The words themselves — including cards you added — stay.</p>
+      <button class="danger-btn" id="btn-reset">Reset all progress</button>
+      <div class="confirm-box hidden" id="reset-confirm">
+        <p>Reset all progress in French and Portuguese? Levels lock again from Level 1. This cannot be undone.</p>
+        <div class="row">
+          <button class="yes" id="reset-yes">Yes, reset</button>
+          <button class="no" id="reset-no">Keep my progress</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="setting-row">
+      <h3>Remove added cards</h3>
+      <p id="added-count">—</p>
+      <button class="danger-btn" id="btn-wipe">Remove added cards</button>
+      <div class="confirm-box hidden" id="wipe-confirm">
+        <p>Remove every card you added, in both decks? Their levels and progress go with them. The seeded words stay.</p>
+        <div class="row">
+          <button class="yes" id="wipe-yes">Yes, remove</button>
+          <button class="no" id="wipe-no">Keep them</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+"use strict";
+/* ════════════════ SEED DATA ════════════════
+   [word, english, example, example-in-english, noun?1]
+   Adjective pairs are one card: word = "masc · fem". */
+var FR = [
+["dormir","to sleep","Je dors mal avant un gros jour.","I sleep badly before a big day."],
+["le poulet","the chicken","Je mange du poulet et du riz.","I eat chicken and rice.",1],
+["fatigué","tired","Je suis fatigué mais je continue.","I am tired but I keep going."],
+["la réunion","the meeting","La réunion commence à neuf heures.","The meeting starts at nine o'clock.",1],
+["souvent","often","Je m'entraîne souvent le matin.","I often train in the morning."],
+["courir","to run","Il court cinq kilomètres le dimanche.","He runs five kilometres on Sundays."],
+["soulever","to lift","Elle soulève des poids lourds.","She lifts heavy weights."],
+["la guitare","the guitar","Il joue de la guitare le soir.","He plays the guitar in the evening.",1],
+["épuisé","exhausted","Après le travail, je suis épuisé.","After work, I am exhausted."],
+["la cuisine","the kitchen · cooking","La cuisine sent le café.","The kitchen smells of coffee.",1],
+["rater","to miss · to fail","Je ne veux pas rater mon bus.","I don't want to miss my bus."],
+["en avance","early · ahead of time","J'arrive toujours en avance.","I always arrive early."],
+["se lever","to get up","Je me lève à six heures.","I get up at six o'clock."],
+["le réveil","the alarm clock","Mon réveil sonne à cinq heures.","My alarm goes off at five o'clock.",1],
+["tôt","early","Je me couche tôt ce soir.","I'm going to bed early tonight."],
+["le bus","the bus","Le bus passe devant la salle de sport.","The bus passes in front of the gym.",1],
+["appeler","to call","Je vais appeler ma mère ce soir.","I'm going to call my mother tonight."],
+["douloureux","painful","Mon genou est encore douloureux.","My knee is still painful."],
+["la salle de sport","the gym","Je vais à la salle de sport le dimanche.","I go to the gym on Sundays.",1],
+["déjà","already","Tu as déjà mangé ?","Have you already eaten?"],
+["la douche","the shower","Je prends une douche froide.","I take a cold shower.",1],
+["se reposer","to rest","Tu dois te reposer après l'entraînement.","You must rest after training."],
+["occupé","busy · occupied","Je suis occupé toute la journée.","I am busy all day."],
+["le poignet","the wrist","Il s'est fait mal au poignet.","He hurt his wrist.",1],
+["cuisiner","to cook","Elle cuisine un repas simple.","She cooks a simple meal."],
+["vite","quickly · fast","Il parle trop vite pour moi.","He speaks too fast for me."],
+["affamé","starving · very hungry","Après le sport, je suis affamé.","After sport, I'm starving."],
+["le film","the film · movie","Ce film est long mais beau.","This film is long but beautiful.",1],
+["ranger","to tidy up · to put away","Je range ma chambre le dimanche.","I tidy my room on Sundays."],
+["frais","fresh · cool","L'air du matin est frais.","The morning air is cool."],
+["encore","again · still · yet","Tu veux encore du café ?","Do you want more coffee? / still"],
+["la chanson","the song","Cette chanson me calme.","This song calms me.",1],
+["écrire","to write","J'écris quelques lignes chaque jour.","I write a few lines every day."],
+["le dos","the back","J'ai mal au dos ce matin.","My back hurts this morning.",1],
+["fort · forte","strong","Il est fort et il le sait.","He is strong and he knows it."],
+["tard","late","Je rentre tard ce soir.","I'm coming home late tonight."],
+["finir","to finish","Je finis mon livre cette semaine.","I finish my book this week."],
+["le riz","the rice","Je mange du riz avec le poulet.","I eat rice with the chicken.",1],
+["lourd · lourde","heavy","Ce sac est trop lourd.","This bag is too heavy."],
+["le repas","the meal","Le repas est prêt à sept heures.","The meal is ready at seven.",1],
+["léger · légère","light (not heavy)","Je prépare un repas léger.","I prepare a light meal."],
+["nettoyer","to clean","Je nettoie la cuisine après le dîner.","I clean the kitchen after dinner."],
+["toujours","always · still","Il est toujours en avance.","He is always early."],
+["la pause","the break · pause","Je fais une pause de dix minutes.","I take a ten-minute break.",1],
+["travailler","to work","Je travaille de neuf heures à six heures.","I work from nine to six."],
+["le genou","the knee","Mon genou me fait mal.","My knee hurts.",1],
+["s'étirer","to stretch","Je m'étire après chaque séance.","I stretch after every session."],
+["la lessive","the laundry","Je fais la lessive le samedi.","I do the laundry on Saturdays.",1],
+["content · contente","happy · pleased · glad","Elle est contente de son travail.","She is happy with her work."],
+["enregistrer","to record","J'enregistre ma voix en français.","I record my voice in French."],
+["jamais","never · ever","Je ne mange jamais de fast-food.","I never eat fast food."],
+["s'entraîner","to train · to work out","Je m'entraîne trois fois par semaine.","I train three times a week."],
+["lent · lente","slow","Ce bus est très lent.","This bus is very slow."],
+["l'épaule","the shoulder","Il soulève avec les épaules.","He lifts with his shoulders.",1],
+["l'eau","the water","Je bois beaucoup d'eau.","I drink a lot of water.",1],
+["le shampoing","the shampoo","Je mets du shampoing, puis je rince.","I put on shampoo, then I rinse.",1],
+["marcher","to walk","Je marche jusqu'à la salle de sport.","I walk to the gym."],
+["heureux · heureuse","happy","Ils sont heureux ensemble.","They are happy together."],
+["se brosser","to brush (your hair / teeth)","Je me brosse les dents le matin.","I brush my teeth in the morning."],
+["le casque","the helmet · headset","Il porte un casque à vélo.","He wears a helmet on the bike.",1],
+["lentement","slowly","Parle lentement, s'il te plaît.","Speak slowly, please."],
+["énervé · énervée","annoyed · irritated · wound up","Elle est énervée par le bruit.","She is annoyed by the noise."],
+["lire","to read","Je lis dix pages par jour.","I read ten pages a day."],
+["le téléphone","the phone","Mon téléphone est dans mon sac.","My phone is in my bag.",1],
+["le trajet","the journey · the way there","Le trajet dure deux heures.","The journey takes two hours.",1],
+["essayer","to try","Je vais essayer encore une fois.","I'm going to try one more time."],
+["la serviette","the towel · napkin","La serviette est près de la douche.","The towel is near the shower.",1],
+["détendu · détendue","relaxed","Après la douche, je suis détendu.","After the shower, I'm relaxed."],
+["bientôt","soon","On se voit bientôt.","See you soon."],
+["écouter","to listen","J'écoute un podcast en français.","I listen to a podcast in French."],
+["le manteau","the coat","Je mets mon manteau, il fait froid.","I put on my coat, it's cold.",1],
+["prêt · prête","ready","Je suis prêt, on y va.","I'm ready, let's go."],
+["ensemble","together","Ils travaillent ensemble.","They work together."],
+["le parapluie","the umbrella","Prends le parapluie, il pleut.","Take the umbrella, it's raining.",1],
+["se coucher","to go to bed","Je me couche vers onze heures.","I go to bed around eleven."],
+["le miroir","the mirror","Il se regarde dans le miroir.","He looks at himself in the mirror.",1],
+["répondre","to answer · to reply","Je réponds à son message ce soir.","I reply to his message tonight."],
+["calme","calm","Elle reste calme sous la pression.","She stays calm under pressure."],
+["la fenêtre","the window","Ouvre la fenêtre, il fait chaud.","Open the window, it's hot.",1],
+["s'endormir","to fall asleep","Je m'endors vite après le travail de nuit.","I fall asleep fast after night work."],
+["l'écran","the screen","Je regarde l'écran toute la journée.","I look at the screen all day.",1],
+["parfois","sometimes","Parfois, je mange un seul repas.","Sometimes I eat only one meal."],
+["le client","the client · customer","Le client pose beaucoup de questions.","The client asks a lot of questions.",1],
+["boire","to drink","Je bois de l'eau, pas de café.","I drink water, not coffee."],
+["le silence","the silence","Le silence de la nuit me calme.","The silence of the night calms me.",1],
+["chaud · chaude","hot · warm","Le café est encore chaud.","The coffee is still hot."],
+["attendre","to wait","Je dois attendre le bus.","I have to wait for the bus."],
+["le frigo","the fridge","Le poulet est dans le frigo.","The chicken is in the fridge.",1],
+["froid · froide","cold","L'eau est froide ce matin.","The water is cold this morning."],
+["le sac","the bag","Mon sac est lourd aujourd'hui.","My bag is heavy today.",1],
+["respirer","to breathe","Respire lentement et reste calme.","Breathe slowly and stay calm."],
+["le coude","the elbow","Il se repose sur le coude.","He leans on his elbow.",1],
+["le clavier","the keyboard","Mon clavier est vieux mais il marche.","My keyboard is old but it works.",1],
+["s'habiller","to get dressed","Je m'habille vite le matin.","I get dressed quickly in the morning."],
+["doux · douce","soft · gentle · sweet","Sa voix est douce.","Her voice is soft."],
+["sourire","to smile · a smile","Elle sourit quand elle le voit.","She smiles when she sees him."],
+["le pantalon","the trousers · pants","Ce pantalon est trop grand.","These trousers are too big.",1],
+["le rendez-vous","the appointment","J'ai un rendez-vous à midi.","I have an appointment at noon.",1],
+["presque","almost","Je suis presque prêt.","I'm almost ready."],
+["le sommeil","sleep (the state)","Le sommeil est important pour le muscle.","Sleep is important for muscle.",1],
+["préparer","to prepare","Je prépare mon sac le soir.","I prepare my bag in the evening."],
+["ensuite","then · next","Je mange, ensuite je lis.","I eat, then I read."],
+["propre","clean · one's own","Ma chambre est propre.","My room is clean."],
+["le coup de fil","a phone call (quick)","Je passe un coup de fil à ma sœur.","I give my sister a quick call.",1],
+["rire","to laugh","Ils rient ensemble tout le temps.","They laugh together all the time."],
+["la sieste","the nap","Une petite sieste et je repars.","A short nap and I'm off again.",1],
+["transpirer","to sweat","Je transpire beaucoup au Muay Thai.","I sweat a lot at Muay Thai."],
+["pressé · pressée","in a hurry · rushed","Je suis pressé, le bus arrive.","I'm in a hurry, the bus is coming."],
+["hier","yesterday","Hier, je me suis entraîné deux heures.","Yesterday I trained for two hours."],
+["l'oreiller","the pillow","Mon oreiller est trop doux.","My pillow is too soft.",1],
+["jouer","to play","Il joue de la guitare le soir.","He plays the guitar in the evening."],
+["tout de suite","right away · immediately","Je te réponds tout de suite.","I'll answer you right away."],
+["sortir","to go out · to leave","Je sors après le dîner.","I go out after dinner."],
+["la voix","the voice","Sa voix est calme et basse.","Her voice is calm and low.",1],
+["facile","easy","Ce mot est facile à retenir.","This word is easy to remember."],
+["le colocataire","the flatmate · roommate","Mon colocataire arrive en novembre.","My flatmate arrives in November.",1],
+["oublier","to forget","Je ne veux pas oublier ce mot.","I don't want to forget this word."],
+["le matin","the morning","Le matin, je bois un café.","In the morning, I drink a coffee.",1],
+["commencer","to start · to begin","Je commence à huit heures.","I start at eight o'clock."],
+["ouvrir","to open","Ouvre la porte, s'il te plaît.","Open the door, please."],
+["fermer","to close","Ferme la fenêtre, il fait froid.","Close the window, it's cold."],
+["la porte","the door","La porte est fermée à clé.","The door is locked.",1],
+["la lumière","the light","La lumière du matin me réveille.","The morning light wakes me.",1],
+["seul · seule","alone · only","Il travaille seul la nuit.","He works alone at night."],
+["dedans","inside","Le livre est dedans, dans le sac.","The book is inside, in the bag."],
+["dehors","outside","Il fait froid dehors.","It's cold outside."],
+["aussi","also · too","Je parle aussi un peu de portugais.","I also speak a little Portuguese."],
+["parce que","because","Je reste parce que je t'aime.","I stay because I love you."],
+["avec","with","Je m'entraîne avec mon coach.","I train with my coach."],
+["sans","without","Je sors sans mon téléphone.","I go out without my phone."],
+["demain","tomorrow","Demain, je recommence.","Tomorrow, I start again."],
+["peut-être","maybe · perhaps","Peut-être qu'elle va répondre.","Maybe she will answer."],
+["quelque chose","something","Je veux te montrer quelque chose.","I want to show you something."],
+["quelqu'un","someone","Quelqu'un t'attend dehors.","Someone is waiting for you outside."],
+["surtout","especially · above all","J'aime surtout les livres courts.","I especially like short books."],
+["d'abord","first · first of all","D'abord, je bois un café.","First, I drink a coffee."],
+["puis","then","Je mange, puis je pars.","I eat, then I leave."],
+["se débrouiller","to manage · to get by","Il se débrouille seul depuis des mois.","He has been managing alone for months."],
+["être fatigué de","to be tired of","Je suis fatigué d'attendre.","I am tired of waiting."],
+["tout va bien","everything is fine · all good","Ne t'inquiète pas, tout va bien.","Don't worry, everything is fine."],
+["le pain","the bread","Je mange du pain avec la soupe.","I eat bread with the soup.",1],
+["payer","to pay","Je paie le café pour nous deux.","I pay for the coffee for both of us."],
+["patient · patiente","patient","Elle est patiente avec les clients difficiles.","She is patient with difficult clients."],
+["maintenant","now","Maintenant, je comprends mieux.","Now I understand better."],
+["le muscle","the muscle","Le muscle grandit avec le repos.","Muscle grows with rest.",1],
+["arriver","to arrive · to happen","Le bus arrive dans cinq minutes.","The bus arrives in five minutes."],
+["tranquille","quiet · calm · peaceful","Le quartier est tranquille la nuit.","The neighbourhood is quiet at night."],
+["le petit-déjeuner","breakfast","Je prends un petit-déjeuner simple.","I have a simple breakfast.",1],
+["manger","to eat","Je mange un seul repas par jour.","I eat one meal a day."],
+["la poubelle","the bin · trash can","Je mets le papier à la poubelle.","I put the paper in the bin.",1],
+["se réveiller","to wake up","Je me réveille avant mon réveil.","I wake up before my alarm."],
+["beaucoup","a lot · much · many","Je travaille beaucoup cette semaine.","I work a lot this week."],
+["la boulangerie","the bakery","La boulangerie ouvre à sept heures.","The bakery opens at seven.",1],
+["chercher","to look for","Je cherche mes écouteurs.","I'm looking for my earphones."],
+["la soupe","the soup","La soupe est chaude et bonne.","The soup is hot and good.",1],
+["apporter","to bring","Je t'apporte un café.","I'll bring you a coffee."],
+["difficile","difficult · hard","Ce mot est difficile à dire.","This word is hard to say."],
+["la cheville","the ankle","Elle s'est fait mal à la cheville.","She hurt her ankle.",1],
+["vraiment","really · truly","Je suis vraiment fatigué ce soir.","I am really tired tonight."],
+["acheter","to buy","Je vais acheter un livre demain.","I'm going to buy a book tomorrow."],
+["le dîner","dinner","Le dîner est à huit heures.","Dinner is at eight o'clock.",1],
+["motivé · motivée","motivated","Il est motivé, même le dimanche.","He is motivated, even on Sundays."],
+["monter","to go up · to climb · to get on","Je monte dans le bus.","I get on the bus."],
+["chez","at someone's place · at home","Je mange chez ma sœur ce soir.","I'm eating at my sister's tonight."],
+["avant","before","Je lis avant de dormir.","I read before sleeping."],
+["après","after","Après le travail, je m'entraîne.","After work, I train."],
+["pendant","during · for (time)","Je dors pendant le trajet.","I sleep during the journey."],
+["entre","between","Le café est entre la banque et la poste.","The café is between the bank and the post office."],
+["loin","far","La salle de sport est loin d'ici.","The gym is far from here."],
+["longtemps","for a long time · a long time","Je t'ai attendu longtemps.","I waited for you a long time."],
+["rien","nothing","Je ne dis rien, je continue.","I say nothing, I keep going."],
+["tenir","to hold","Tiens la porte, s'il te plaît.","Hold the door, please."],
+["rester","to stay · to remain","Je reste à la maison ce soir.","I'm staying home tonight."],
+["prendre","to take","Je prends le bus à sept heures.","I take the bus at seven."],
+["mettre","to put · to put on","Je mets mon manteau et je sors.","I put on my coat and I go out."],
+["donner","to give","Je lui donne le livre demain.","I give him the book tomorrow."],
+["voir","to see","Je veux voir ce film avec toi.","I want to see this film with you."],
+["penser","to think","Je pense à elle le soir.","I think about her in the evening."],
+["le soleil","the sun","Le soleil est fort aujourd'hui.","The sun is strong today.",1],
+["la pluie","the rain","La pluie tombe depuis ce matin.","The rain has been falling since this morning.",1],
+["le ciel","the sky","Le ciel est bleu ce matin.","The sky is blue this morning.",1],
+["trouver","to find","Je ne trouve pas mon téléphone.","I can't find my phone."],
+["porter","to carry · to wear","Il porte un sac lourd.","He carries a heavy bag."],
+["le nuage","the cloud","Un seul nuage dans le ciel.","One single cloud in the sky.",1],
+["la neige","the snow","La neige couvre la rue.","The snow covers the street.",1],
+["le vent","the wind","Le vent est froid ce soir.","The wind is cold tonight.",1],
+["gagner","to win · to earn","Il gagne bien sa vie.","He earns a good living."],
+["la jambe","the leg","Ma jambe est lourde après la course.","My leg is heavy after the run.",1],
+["perdre","to lose","Je ne veux pas perdre mon temps.","I don't want to waste (lose) my time."],
+["laisser","to leave (something) · to let","Laisse la porte ouverte.","Leave the door open."],
+["suivre","to follow","Je suis le cours en ligne.","I follow the online course."],
+["tomber","to fall","La neige tombe doucement.","The snow falls softly."],
+["réussir","to succeed · to pass","Je vais réussir mon test de français.","I will pass my French test."],
+["vendre","to sell","Il vend sa vieille guitare.","He sells his old guitar."],
+["raconter","to tell (a story)","Elle raconte son voyage à Toronto.","She tells about her trip to Toronto."],
+["choisir","to choose","Je choisis le livre rouge.","I choose the red book."],
+["la chaise","the chair","La chaise est près de la fenêtre.","The chair is near the window.",1],
+["descendre","to go down · to get off","Je descends à la prochaine station.","I get off at the next station."],
+["le savon","the soap","Je me lave les mains avec du savon.","I wash my hands with soap.",1],
+["sec · sèche","dry","L'air est sec en hiver.","The air is dry in winter."],
+["s'échauffer","to warm up","Je m'échauffe avant de soulever.","I warm up before lifting."],
+["le collègue","the colleague","Mon collègue parle espagnol et français.","My colleague speaks Spanish and French.",1],
+["rapide","fast · quick","Ce train est très rapide.","This train is very fast."],
+["la faim","hunger","La faim arrive après l'entraînement.","Hunger comes after training.",1],
+["aider","to help","Je vais aider mon collègue demain.","I'm going to help my colleague tomorrow."],
+["la chambre","the bedroom · room","Ma chambre est petite mais calme.","My room is small but quiet.",1],
+["le salon","the living room","On parle dans le salon.","We talk in the living room.",1],
+["parler","to speak · to talk","Je parle français au travail parfois.","I speak French at work sometimes."],
+["la corde","the rope · skipping rope","Je saute à la corde pour m'échauffer.","I skip rope to warm up.",1],
+["sauter","to jump","Les enfants sautent dans la cour.","The children jump in the yard."],
+["la bouteille","the bottle","Ma bouteille d'eau est toujours avec moi.","My water bottle is always with me.",1],
+["apprendre","to learn","J'apprends le français chaque jour.","I learn French every day."],
+["nouveau · nouvelle","new","C'est un nouveau départ.","It's a new start."],
+["où","where","Où est la salle de sport ?","Where is the gym?"],
+["le canapé","the sofa · couch","Je lis sur le canapé le soir.","I read on the sofa in the evening.",1],
+["vouloir","to want","Je veux parler couramment.","I want to speak fluently."],
+["le soir","the evening","Le soir, je filme mes vidéos.","In the evening, I film my videos.",1],
+["aujourd'hui","today","Aujourd'hui, je m'entraîne deux heures.","Today I train for two hours."],
+["rentrer","to go home · to come back in","Je rentre tard le jeudi.","I come home late on Thursdays."],
+["habiter","to live (in a place)","J'habite à Toronto.","I live in Toronto."],
+["gentil · gentille","kind · nice","Elle est gentille avec tout le monde.","She is kind to everyone."],
+["le café","the coffee · café","Je bois un café le matin.","I drink a coffee in the morning.",1],
+["grand · grande","big · tall","Toronto est une grande ville.","Toronto is a big city."],
+["les écouteurs","the earphones","Je mets mes écouteurs et j'écoute.","I put in my earphones and I listen.",1],
+["l'entraînement","training · the workout","L'entraînement commence à vingt heures.","Training starts at eight in the evening.",1],
+["chanter","to sing","Elle chante sous la douche.","She sings in the shower."],
+["malade","sick · ill","Je suis malade, je reste au lit.","I am sick, I stay in bed."],
+["jeune","young","Il est jeune mais il travaille dur.","He is young but he works hard."],
+["le déjeuner","lunch","Le déjeuner est à midi et demi.","Lunch is at half past twelve.",1],
+["garder","to keep · to look after","Je garde le livre pour toi.","I keep the book for you."],
+["le yaourt","the yogurt","Je mange un yaourt avec le repas.","I eat a yogurt with the meal.",1],
+["venir","to come","Tu viens à la salle dimanche ?","Are you coming to the gym on Sunday?"],
+["partir","to leave","Je pars à dix heures ce soir.","I leave at ten tonight."],
+["comprendre","to understand","Je comprends presque tout maintenant.","I understand almost everything now."],
+["demander","to ask · to ask for","Je demande un café, s'il vous plaît.","I ask for a coffee, please."],
+["savoir","to know (a fact)","Je sais que c'est difficile.","I know that it is difficult."],
+["aimer","to love · to like","J'aime ce livre plus que les autres.","I love this book more than the others."],
+["la semaine","the week","Je m'entraîne cinq jours par semaine.","I train five days a week.",1],
+["le mois","the month","Le mois de novembre est froid ici.","The month of November is cold here.",1],
+["petit · petite","small · little","C'est un petit pas chaque jour.","It's a small step each day."],
+["recevoir","to receive · to get","Je reçois son message le soir.","I receive her message in the evening."],
+["décider","to decide","Je décide de continuer, toujours.","I decide to keep going, always."],
+["expliquer","to explain","Explique-moi ce mot, s'il te plaît.","Explain this word to me, please."],
+["croire","to believe","Je crois que tout va bien finir.","I believe everything will turn out well."],
+["espérer","to hope","J'espère te voir bientôt.","I hope to see you soon."],
+["promettre","to promise","Je promets de ne jamais abandonner.","I promise to never give up."],
+["manquer","to miss · to be missing","Tu me manques chaque jour.","I miss you every day. (You are missing to me.)"],
+["pleurer","to cry","Elle pleure devant ce film.","She cries in front of this film."],
+["le gant","the glove","Je mets mes gants, il neige.","I put on my gloves, it's snowing.",1],
+["libre","free · available","Je suis libre dimanche soir.","I am free on Sunday evening."],
+["pouvoir","to be able to · can","Je peux le faire seul.","I can do it alone."],
+["différent · différente","different","Chaque jour est différent.","Each day is different."],
+["le pied","the foot","Il se tient sur un pied.","He stands on one foot.",1],
+["le bras","the arm","Mon bras est fort maintenant.","My arm is strong now.",1],
+["envoyer","to send","Je t'envoie le fichier ce soir.","I'll send you the file tonight."],
+["le fromage","the cheese","Je mets du fromage dans la soupe.","I put cheese in the soup.",1],
+["devoir","to have to · must","Je dois partir maintenant.","I have to leave now."],
+["conduire","to drive","Elle conduit jusqu'à Whitby.","She drives to Whitby."],
+["le vélo","the bike · bicycle","Mon vélo est devant la maison.","My bike is in front of the house.",1],
+["pousser","to push","Je pousse la porte et j'entre.","I push the door and I go in."],
+["rencontrer","to meet · to encounter","Je rencontre mon coach à la salle.","I meet my coach at the gym."],
+["l'année","the year","Cette année, tout change.","This year, everything changes.",1],
+["la rue","the street","La rue est calme le dimanche matin.","The street is quiet on Sunday morning.",1],
+["la fleur","the flower","Une fleur rouge sur la table.","A red flower on the table.",1],
+["la peur","fear","La peur ne décide pas pour moi.","Fear does not decide for me.",1],
+["la joie","joy","Sa joie est simple et vraie.","Her joy is simple and true.",1],
+["plein","full","Le verre est plein d'eau.","The glass is full of water."],
+["vide","empty","La rue est vide la nuit.","The street is empty at night."],
+["le livre","the book","Ce livre reste avec moi.","This book stays with me.",1],
+["la viande","the meat","Je mange peu de viande.","I eat little meat.",1],
+["étudier","to study","J'étudie le français le soir.","I study French in the evening."],
+["le bureau","the desk · office","Mon bureau est près de la fenêtre.","My desk is near the window.",1],
+["le train","the train","Le train part à sept heures.","The train leaves at seven.",1],
+["regarder","to look at · to watch","Je regarde un film le dimanche.","I watch a film on Sundays."],
+["danser","to dance","Ils dansent ensemble dans le salon.","They dance together in the living room."]
+];
+var PT = [
+["o livro","the book","Este livro fica comigo.","This book stays with me.",1],
+["a casa","the house","A casa está quieta à noite.","The house is quiet at night.",1],
+["o coração","the heart","O coração sabe a verdade.","The heart knows the truth.",1],
+["o tempo","time · the weather","O tempo passa depressa.","Time passes quickly.",1],
+["sempre","always","Eu acordo sempre cedo.","I always wake up early."],
+["hoje","today","Hoje eu treino duas horas.","Today I train for two hours."],
+["amanhã","tomorrow","Amanhã eu começo de novo.","Tomorrow I start again."],
+["longe","far","A academia fica longe daqui.","The gym is far from here."],
+["o dia","the day","O dia começa às seis.","The day starts at six.",1],
+["a noite","the night","A noite está calma hoje.","The night is calm today.",1],
+["a voz","the voice","A voz dela é calma.","Her voice is calm.",1],
+["o sorriso","the smile","O sorriso dela fica na memória.","Her smile stays in my memory.",1],
+["os olhos","the eyes","Os olhos dela são escuros.","Her eyes are dark.",1],
+["o abraço","the hug · embrace","Um abraço resolve muita coisa.","A hug fixes a lot of things.",1],
+["o corpo","the body","O corpo precisa de descanso.","The body needs rest.",1],
+["a distância","the distance","A distância não muda nada.","The distance changes nothing.",1],
+["o trabalho","work · the job","O trabalho começa às nove.","Work starts at nine.",1],
+["correr","to run","Eu corro no domingo de manhã.","I run on Sunday morning."],
+["a academia","the gym","Eu vou à academia aos domingos.","I go to the gym on Sundays.",1],
+["gravar","to record","Eu gravo vídeos à noite.","I record videos at night."],
+["ler","to read","Eu leio dez páginas por dia.","I read ten pages a day."],
+["forte","strong","Ele é forte e sabe disso.","He is strong and he knows it."],
+["o silêncio","the silence","O silêncio da noite me acalma.","The silence of the night calms me.",1],
+["dormir","to sleep","Eu durmo mal antes de um dia grande.","I sleep badly before a big day."],
+["a saudade","saudade — the deep longing for someone absent","A saudade fica, mas eu continuo.","The longing stays, but I keep going.",1],
+["o caminho","the path · way","O caminho é longo, mas é meu.","The path is long, but it is mine.",1],
+["voltar","to come back · return","Um dia eu volto para casa.","One day I come back home."],
+["cansado","tired","Estou cansado, mas continuo.","I am tired, but I keep going."],
+["a força","strength · force","A força vem com o tempo.","Strength comes with time.",1],
+["pensar","to think","Eu penso nela à noite.","I think about her at night."],
+["esperar","to wait · to hope","Eu espero sem parar de viver.","I wait without stopping my life."],
+["o céu","the sky · heaven","O céu está azul hoje.","The sky is blue today.",1],
+["a manhã","the morning","A manhã começa com café.","The morning starts with coffee.",1],
+["começar","to start · begin","Eu começo às oito.","I start at eight."],
+["abrir","to open","Abre a porta, por favor.","Open the door, please."],
+["fechar","to close","Fecha a janela, está frio.","Close the window, it's cold."],
+["a porta","the door","A porta está fechada.","The door is closed.",1],
+["a luz","the light","A luz da manhã me acorda.","The morning light wakes me.",1],
+["sozinho","alone","Ele trabalha sozinho à noite.","He works alone at night."],
+["fora","outside","Está frio lá fora.","It's cold outside."],
+["agora","now","Agora eu entendo melhor.","Now I understand better."],
+["depois","after · later","Depois do trabalho, eu treino.","After work, I train."],
+["antes","before","Eu leio antes de dormir.","I read before sleeping."],
+["perto","near · close","A academia fica perto daqui.","The gym is near here."],
+["devagar","slowly","Fala devagar, por favor.","Speak slowly, please."],
+["juntos","together","Eles treinam juntos.","They train together."],
+["o amor","love","O amor dela era simples.","Her love was simple.",1],
+["ficar","to stay · to be · to become","Eu fico em casa hoje.","I stay home today."],
+["obrigado","thank you (said by a man)","Obrigado por tudo.","Thank you for everything."],
+["lindo","beautiful · lovely","O dia está lindo hoje.","The day is beautiful today."],
+["o cabelo","the hair","O cabelo dela é longo.","Her hair is long.",1],
+["comer","to eat","Eu como uma refeição por dia.","I eat one meal a day."],
+["beber","to drink","Eu bebo muita água.","I drink a lot of water."],
+["a água","the water","A água está fria hoje.","The water is cold today.",1],
+["o sol","the sun","O sol está forte hoje.","The sun is strong today.",1],
+["a praia","the beach","A praia fica longe da cidade.","The beach is far from the city.",1],
+["feliz","happy","Eles estão felizes juntos.","They are happy together."],
+["chegar","to arrive","O ônibus chega em cinco minutos.","The bus arrives in five minutes."],
+["vir","to come","Você vem no domingo?","Are you coming on Sunday?"],
+["partir","to leave","Eu parto às dez da noite.","I leave at ten at night."],
+["entender","to understand","Eu entendo quase tudo agora.","I understand almost everything now."],
+["perguntar","to ask","Eu pergunto e ela responde.","I ask and she answers."],
+["saber","to know (a fact)","Eu sei que é difícil.","I know that it is difficult."],
+["amar","to love","Eu amo este livro.","I love this book."],
+["a semana","the week","Eu treino cinco dias por semana.","I train five days a week.",1],
+["o mês","the month","O mês de novembro é frio aqui.","The month of November is cold here.",1],
+["encontrar","to find · to meet","Eu encontro meu treinador na academia.","I meet my coach at the gym."],
+["o ano","the year","Este ano, tudo muda.","This year, everything changes.",1],
+["a rua","the street","A rua está vazia à noite.","The street is empty at night.",1],
+["a flor","the flower","Uma flor vermelha na mesa.","A red flower on the table.",1],
+["o medo","fear","O medo não decide por mim.","Fear does not decide for me.",1],
+["a alegria","joy","A alegria dela é simples.","Her joy is simple.",1],
+["cheio","full","O copo está cheio de água.","The glass is full of water."],
+["vazio","empty","O quarto está vazio.","The room is empty."]
+];
+
+
+/* ════════════════ STATE ════════════════ */
+var LS_KEY = "flashcards-meet-v1";
+var DECKS = {
+  fr: { name: "French",   langLabel: "en français", seed: FR },
+  pt: { name: "Portuguese", langLabel: "em português", seed: PT }
+};
+var LEVEL_SIZE = 20;
+
+function blankState(){
+  return {
+    added: { fr: [], pt: [] },
+    /* levels: { "fr-0": {attempts:0, mastered:false} } */
+    levels: {},
+    /* cards: { "fr-12": {firstTry: null|true|false, seen:0, miss:0} } */
+    cards: {}
+  };
+}
+var state = blankState();
+try {
+  var raw = localStorage.getItem(LS_KEY);
+  if (raw) {
+    var parsed = JSON.parse(raw);
+    if (parsed && parsed.added && parsed.levels && parsed.cards) state = parsed;
+  }
+} catch(e){}
+function save(){ try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch(e){} }
+
+function deckCards(deckKey){
+  var base = DECKS[deckKey].seed.slice();
+  return base.concat(state.added[deckKey] || []);
+}
+function levelCount(deckKey){ return Math.ceil(deckCards(deckKey).length / LEVEL_SIZE); }
+function levelCards(deckKey, lvl){
+  var all = deckCards(deckKey);
+  return all.slice(lvl * LEVEL_SIZE, (lvl + 1) * LEVEL_SIZE)
+            .map(function(c, i){ return { card: c, idx: lvl * LEVEL_SIZE + i }; });
+}
+function lvlKey(deckKey, lvl){ return deckKey + "-" + lvl; }
+function lvlState(deckKey, lvl){
+  return state.levels[lvlKey(deckKey, lvl)] || { attempts: 0, mastered: false };
+}
+function isUnlocked(deckKey, lvl){
+  if (lvl === 0) return true;
+  return lvlState(deckKey, lvl - 1).mastered === true;
+}
+function masteredCount(deckKey){
+  var n = 0, total = levelCount(deckKey);
+  for (var i = 0; i < total; i++) if (lvlState(deckKey, i).mastered) n++;
+  return n;
+}
+function currentLevel(deckKey){
+  var total = levelCount(deckKey);
+  for (var i = 0; i < total; i++) if (!lvlState(deckKey, i).mastered) return i;
+  return total - 1;
+}
+function isNoun(card){ return card[4] === 1; }
+function looksLikeNoun(word, deckKey){
+  var w = word.trim().toLowerCase();
+  if (deckKey === "fr") return /^(le|la|les|l['’])\s/.test(w) || /^l['’]/.test(w);
+  return /^(o|a|os|as)\s/.test(w);
+}
+
+/* ════════════════ NAVIGATION ════════════════ */
+var screens = ["home", "drill", "add", "settings"];
+function show(name){
+  screens.forEach(function(s){
+    document.getElementById("screen-" + s).classList.toggle("hidden", s !== name);
+  });
+  window.scrollTo(0, 0);
+  if (name === "home") renderHome();
+  if (name === "settings") renderSettings();
+}
+function frenchDate(){
+  try {
+    var s = new Date().toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
+    return s.replace(/\./g, "").toUpperCase();
+  } catch(e){ return ""; }
+}
+
+/* ════════════════ HOME ════════════════ */
+function renderDeck(deckKey){
+  var host = document.getElementById("deck-" + deckKey);
+  var cards = deckCards(deckKey);
+  var total = levelCount(deckKey);
+  var done = masteredCount(deckKey);
+  var cur = currentLevel(deckKey);
+  var allDone = done === total;
+  var html = "";
+  html += '<div class="deck">';
+  html += '<div class="deck-head"><h2 class="deck-name">' + DECKS[deckKey].name + '</h2>' +
+          '<div class="deck-words">' + cards.length + ' words</div></div>';
+  html += '<div class="deck-stats"><div class="big-figure">' + done + '<span style="font-size:34px;">/' + total + '</span></div>' +
+          '<div class="stat-label">levels mastered<br/>' +
+          (allDone ? '<b>Deck complete.</b>' : 'current level — <b>Level ' + (cur + 1) + '</b>') +
+          '</div></div>';
+  html += '<div class="level-grid">';
+  for (var i = 0; i < total; i++){
+    var st = lvlState(deckKey, i);
+    var cls = st.mastered ? "mastered" : (isUnlocked(deckKey, i) ? (i === cur ? "current" : "") : "locked");
+    var size = levelCards(deckKey, i).length;
+    var sub = st.mastered ? "mastered" : (isUnlocked(deckKey, i) ? size + " cards" : "locked");
+    html += '<button class="lvl ' + cls + '" data-deck="' + deckKey + '" data-lvl="' + i + '"' +
+            (isUnlocked(deckKey, i) ? "" : " disabled") + '>' +
+            '<span class="n">' + (i + 1) + '</span><span class="c">' + sub + '</span></button>';
+  }
+  html += '</div>';
+  if (!allDone){
+    var att = lvlState(deckKey, cur).attempts;
+    html += '<button class="drill-btn" data-drill="' + deckKey + '">Drill' +
+            '<small>Level ' + (cur + 1) + ' · ' + levelCards(deckKey, cur).length + ' cards' +
+            (att ? ' · ' + att + (att === 1 ? ' loop' : ' loops') + ' attempted' : '') + '</small></button>';
+  } else {
+    html += '<div class="deck-done"><b>Every level mastered.</b> Tap any level above to run it again — the same rule applies: a clean pass, zero misses.</div>';
+  }
+  html += '</div>';
+  host.innerHTML = html;
+}
+function renderHome(){
+  document.getElementById("dateline").textContent = frenchDate();
+  renderDeck("fr");
+  renderDeck("pt");
+  document.querySelectorAll("[data-drill]").forEach(function(b){
+    b.addEventListener("click", function(){ startDrill(b.getAttribute("data-drill"), currentLevel(b.getAttribute("data-drill"))); });
+  });
+  document.querySelectorAll(".lvl:not(.locked)").forEach(function(b){
+    b.addEventListener("click", function(){ startDrill(b.getAttribute("data-deck"), parseInt(b.getAttribute("data-lvl"), 10)); });
+  });
+}
+
+/* ════════════════ DRILL ENGINE ════════════════
+   One level = a loop of passes. A pass deals every card once.
+   A missed card is re-dealt later in the same pass.
+   A pass with zero first-presentation misses masters the level. */
+var S = null;
+function shuffle(a){
+  for (var i = a.length - 1; i > 0; i--){
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+function pickDirection(card){
+  if (isNoun(card)) return "prod"; /* nouns: production is mandatory, every loop */
+  return Math.random() < 0.5 ? "prod" : "recog";
+}
+function startDrill(deckKey, lvl){
+  S = {
+    deck: deckKey, lvl: lvl,
+    items: levelCards(deckKey, lvl),
+    pass: 0, queue: [], current: null, revealed: false,
+    passMisses: 0, seenThisPass: {}, finished: false
+  };
+  var key = lvlKey(deckKey, lvl);
+  if (!state.levels[key]) state.levels[key] = { attempts: 0, mastered: false };
+  document.getElementById("drill-title").textContent =
+    DECKS[deckKey].name + " — Level " + (lvl + 1);
+  document.getElementById("drill-dateline").textContent = frenchDate() + " · " + DECKS[deckKey].name;
+  document.getElementById("drill-end").classList.add("hidden");
+  document.getElementById("drill-live").classList.remove("hidden");
+  show("drill");
+  startPass();
+}
+function startPass(){
+  S.pass += 1;
+  S.passMisses = 0;
+  S.seenThisPass = {};
+  var key = lvlKey(S.deck, S.lvl);
+  state.levels[key].attempts += 1;
+  save();
+  S.queue = shuffle(S.items.slice()).map(function(it){
+    return { idx: it.idx, card: it.card, dir: pickDirection(it.card), first: true };
+  });
+  nextCard();
+}
+function nextCard(){
+  if (!S.queue.length){ endPass(); return; }
+  S.current = S.queue.shift();
+  S.revealed = false;
+  renderCard();
+}
+function renderCounts(){
+  document.getElementById("c-left").textContent = S.queue.length + (S.current ? 1 : 0);
+  document.getElementById("c-miss").textContent = S.passMisses;
+  document.getElementById("c-loop").textContent = S.pass;
+  document.getElementById("c-size").textContent = S.items.length;
+}
+function renderCard(){
+  renderCounts();
+  var c = S.current.card;
+  var prod = S.current.dir === "prod";
+  document.getElementById("card-dir").textContent =
+    prod ? "Production — say it " + DECKS[S.deck].langLabel : "Recognition — what does it mean?";
+  var front = document.getElementById("card-front");
+  var hint = document.getElementById("card-hint");
+  if (prod){
+    front.textContent = c[1];
+    front.classList.add("small");
+    hint.textContent = isNoun(c)
+      ? "Recall the word — with its article. The article is part of the answer."
+      : "Recall the word before you reveal.";
+  } else {
+    front.textContent = c[0];
+    front.classList.remove("small");
+    hint.textContent = "Recall the English meaning before you reveal.";
+  }
+  document.getElementById("card-back").classList.add("hidden");
+  document.getElementById("verdict").classList.add("hidden");
+  document.getElementById("tap-note").classList.remove("hidden");
+}
+function reveal(){
+  if (!S || S.revealed || !S.current) return;
+  S.revealed = true;
+  var c = S.current.card;
+  var prod = S.current.dir === "prod";
+  var ans = document.getElementById("card-answer");
+  var mean = document.getElementById("card-meaning");
+  if (prod){
+    ans.innerHTML = "";
+    ans.textContent = c[0];
+    mean.textContent = c[1];
+  } else {
+    ans.textContent = c[1];
+    mean.textContent = c[0];
+    mean.style.color = "var(--cream-dim)";
+    mean.style.fontSize = "15px";
+  }
+  if (prod){ mean.style.color = ""; mean.style.fontSize = ""; }
+  document.getElementById("card-ex").textContent = c[2] || "";
+  document.getElementById("card-gloss").textContent = c[3] || "";
+  document.getElementById("card-back").classList.remove("hidden");
+  document.getElementById("verdict").classList.remove("hidden");
+  document.getElementById("tap-note").classList.add("hidden");
+}
+function answer(knew){
+  if (!S || !S.revealed || !S.current) return;
+  var cur = S.current;
+  var ck = S.deck + "-" + cur.idx;
+  if (!state.cards[ck]) state.cards[ck] = { firstTry: null, seen: 0, miss: 0 };
+  var rec = state.cards[ck];
+  if (cur.first){
+    rec.seen += 1;
+    if (rec.firstTry === null) rec.firstTry = knew;
+    S.seenThisPass[cur.idx] = true;
+    if (!knew){
+      rec.miss += 1;
+      S.passMisses += 1;
+      requeue(cur);
+    }
+  } else {
+    if (!knew){ rec.miss += 1; requeue(cur); }
+  }
+  save();
+  S.current = null;
+  nextCard();
+}
+function requeue(cur){
+  var again = { idx: cur.idx, card: cur.card, dir: cur.dir, first: false };
+  var pos = S.queue.length === 0 ? 0 : Math.min(S.queue.length, 2 + Math.floor(Math.random() * 3));
+  S.queue.splice(pos, 0, again);
+}
+function endPass(){
+  renderCounts();
+  document.getElementById("drill-live").classList.add("hidden");
+  var end = document.getElementById("drill-end");
+  end.classList.remove("hidden");
+  var key = lvlKey(S.deck, S.lvl);
+  var title = document.getElementById("end-title");
+  var text = document.getElementById("end-text");
+  var primary = document.getElementById("end-primary");
+  if (S.passMisses === 0){
+    state.levels[key].mastered = true;
+    save();
+    title.textContent = "Level " + (S.lvl + 1) + " mastered";
+    var next = S.lvl + 1;
+    text.textContent = "A full pass, zero misses — " + S.items.length + " cards, loop " + S.pass + "." +
+      (next < levelCount(S.deck) ? " Level " + (next + 1) + " is now unlocked." : " That was the last level of this deck.");
+    primary.textContent = next < levelCount(S.deck) ? "Drill Level " + (next + 1) : "Back to decks";
+    primary.onclick = function(){
+      if (next < levelCount(S.deck)) startDrill(S.deck, next); else show("home");
+    };
+  } else {
+    title.textContent = "Loop " + S.pass + " — not clean yet";
+    text.textContent = S.passMisses + (S.passMisses === 1 ? " miss" : " misses") +
+      " this loop. The rule: a full pass with zero misses masters the level. Run the whole level again.";
+    primary.textContent = "Run Level " + (S.lvl + 1) + " again";
+    primary.onclick = function(){
+      document.getElementById("drill-end").classList.add("hidden");
+      document.getElementById("drill-live").classList.remove("hidden");
+      startPass();
+    };
+  }
+}
+
+/* ════════════════ SETTINGS ════════════════ */
+function renderSettings(){
+  var frDone = masteredCount("fr"), ptDone = masteredCount("pt");
+  var firstTryTotal = 0, firstTryHit = 0, loops = 0;
+  Object.keys(state.cards).forEach(function(k){
+    var r = state.cards[k];
+    if (r.firstTry !== null && r.firstTry !== undefined){ firstTryTotal++; if (r.firstTry) firstTryHit++; }
+  });
+  Object.keys(state.levels).forEach(function(k){ loops += state.levels[k].attempts || 0; });
+  document.getElementById("settings-stats").textContent =
+    "French: " + frDone + " of " + levelCount("fr") + " levels mastered · " +
+    "Portuguese: " + ptDone + " of " + levelCount("pt") + " levels mastered · " +
+    loops + " loops attempted · " +
+    (firstTryTotal ? firstTryHit + " of " + firstTryTotal + " cards known on their very first try." : "No cards drilled yet.");
+  var added = (state.added.fr.length + state.added.pt.length);
+  document.getElementById("added-count").textContent =
+    added === 0 ? "No added cards yet. The decks hold the seeded words only."
+                : added + (added === 1 ? " card" : " cards") + " added by you (" +
+                  state.added.fr.length + " French, " + state.added.pt.length + " Portuguese).";
+}
+
+/* ════════════════ WIRING ════════════════ */
+document.getElementById("card").addEventListener("click", reveal);
+document.getElementById("card").addEventListener("keydown", function(ev){
+  if (ev.key === "Enter" || ev.key === " "){ ev.preventDefault(); reveal(); }
+});
+document.getElementById("btn-knew").addEventListener("click", function(){ answer(true); });
+document.getElementById("btn-missed").addEventListener("click", function(){ answer(false); });
+document.getElementById("drill-quit").addEventListener("click", function(){ S = null; show("home"); });
+document.getElementById("end-home").addEventListener("click", function(){ S = null; show("home"); });
+document.getElementById("nav-add").addEventListener("click", function(){ show("add"); });
+document.getElementById("nav-settings").addEventListener("click", function(){ show("settings"); });
+document.querySelectorAll("[data-home]").forEach(function(b){
+  b.addEventListener("click", function(){ show("home"); });
+});
+
+document.getElementById("add-form").addEventListener("submit", function(ev){
+  ev.preventDefault();
+  var deckKey = document.getElementById("add-deck").value;
+  var word = document.getElementById("add-word").value.trim();
+  var meaning = document.getElementById("add-meaning").value.trim();
+  var ex = document.getElementById("add-ex").value.trim();
+  var gloss = document.getElementById("add-gloss").value.trim();
+  var msg = document.getElementById("add-msg");
+  if (!word || !meaning){ msg.textContent = "A card needs at least a word and its English meaning."; return; }
+  var before = levelCount(deckKey);
+  var card = [word, meaning, ex, gloss];
+  if (looksLikeNoun(word, deckKey)) card.push(1);
+  state.added[deckKey].push(card);
+  save();
+  var after = levelCount(deckKey);
+  var lvlOfCard = Math.floor(deckCards(deckKey).length / LEVEL_SIZE) ;
+  msg.textContent = "";
+  var bold = document.createElement("b");
+  bold.textContent = word;
+  msg.appendChild(bold);
+  msg.appendChild(document.createTextNode(" added to " + DECKS[deckKey].name +
+    " — it sits in Level " + (Math.floor((deckCards(deckKey).length - 1) / LEVEL_SIZE) + 1) +
+    (after > before ? ", a new level at the end of the deck." : ".")));
+  document.getElementById("add-word").value = "";
+  document.getElementById("add-meaning").value = "";
+  document.getElementById("add-ex").value = "";
+  document.getElementById("add-gloss").value = "";
+});
+
+document.getElementById("btn-reset").addEventListener("click", function(){
+  document.getElementById("reset-confirm").classList.remove("hidden");
+});
+document.getElementById("reset-no").addEventListener("click", function(){
+  document.getElementById("reset-confirm").classList.add("hidden");
+});
+document.getElementById("reset-yes").addEventListener("click", function(){
+  state.levels = {};
+  state.cards = {};
+  save();
+  document.getElementById("reset-confirm").classList.add("hidden");
+  renderSettings();
+});
+document.getElementById("btn-wipe").addEventListener("click", function(){
+  document.getElementById("wipe-confirm").classList.remove("hidden");
+});
+document.getElementById("wipe-no").addEventListener("click", function(){
+  document.getElementById("wipe-confirm").classList.add("hidden");
+});
+document.getElementById("wipe-yes").addEventListener("click", function(){
+  var addedIdx = { fr: {}, pt: {} };
+  ["fr","pt"].forEach(function(dk){
+    var seedLen = DECKS[dk].seed.length;
+    state.added[dk].forEach(function(_, i){ addedIdx[dk][seedLen + i] = true; });
+  });
+  ["fr","pt"].forEach(function(dk){
+    Object.keys(state.cards).forEach(function(k){
+      var parts = k.split("-");
+      if (parts[0] === dk && addedIdx[dk][parts[1]]) delete state.cards[k];
+    });
+    var total = levelCount(dk), seedLevels = Math.ceil(DECKS[dk].seed.length / LEVEL_SIZE);
+    for (var l = seedLevels; l < total; l++) delete state.levels[lvlKey(dk, l)];
+    var lastSeedLvl = seedLevels - 1;
+    if (state.added[dk].length && state.levels[lvlKey(dk, lastSeedLvl)]){
+      /* last seed level held only seed cards; nothing to trim */
+    }
+    state.added[dk] = [];
+  });
+  save();
+  document.getElementById("wipe-confirm").classList.add("hidden");
+  renderSettings();
+});
+document.getElementById("btn-export").addEventListener("click", function(){
+  var html = "<!doctype html>\n" + document.documentElement.outerHTML;
+  var blob = new Blob([html], { type: "text/html" });
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "flashcards.html";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 400);
+});
+
+renderHome();
+</script>
+</body>
+</html>
