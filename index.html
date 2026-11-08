@@ -140,7 +140,7 @@
   .card{
     margin-top:22px; border-top:1px solid var(--hair); border-bottom:1px solid var(--hair);
     min-height:320px; display:flex; flex-direction:column; justify-content:center;
-    padding:30px 6px; text-align:center; user-select:none; cursor:pointer;
+    padding:30px 6px; text-align:center;
   }
   .card .dir{color:var(--red); font-size:10px; letter-spacing:.24em; text-transform:uppercase; font-weight:600; margin-bottom:18px;}
   .card .front{font-size:30px; font-weight:600; line-height:1.3; word-break:break-word;}
@@ -154,12 +154,49 @@
   .card .gloss{margin-top:5px; font-size:13px; color:var(--cream-dim); font-style:normal;}
   .tap-note{color:var(--cream-faint); font-size:11px; letter-spacing:.18em; text-transform:uppercase; margin-top:22px;}
 
-  .verdict{display:flex; gap:1px; background:var(--hair-soft); border:1px solid var(--hair-soft); margin-top:20px;}
-  .verdict button{flex:1; border:none; padding:20px 8px 17px; font-family:var(--disp); font-weight:600; font-size:21px; letter-spacing:.12em; text-transform:uppercase;}
-  .btn-knew{background:var(--cream); color:#000;}
-  .btn-missed{background:var(--black); color:var(--cream);}
-  .btn-missed span{color:var(--red);}
-  .verdict button:active{opacity:.8;}
+  /* ————— judged answering ————— */
+  .answer-zone{margin-top:26px; text-align:left;}
+  .type-row{display:flex; gap:10px; align-items:stretch;}
+  .type-input{
+    flex:1; min-width:0; background:var(--black); border:none; border-bottom:1px solid var(--hair);
+    color:var(--cream); font-family:var(--mono); font-size:20px; font-weight:600;
+    padding:12px 2px; border-radius:0; appearance:none; -webkit-appearance:none;
+  }
+  .type-input:focus{outline:none; border-bottom-color:var(--cream);}
+  .type-input:disabled{opacity:.55;}
+  .check-btn{
+    background:var(--cream); color:#000; border:none; flex-shrink:0;
+    font-family:var(--disp); font-weight:600; font-size:19px; letter-spacing:.12em;
+    text-transform:uppercase; padding:12px 20px 9px;
+  }
+  .check-btn:active{opacity:.85;}
+  .check-btn:disabled{opacity:.4;}
+  .zone-note{color:var(--cream-faint); font-size:11px; margin-top:9px; letter-spacing:.06em; text-align:left;}
+  .options{display:grid; gap:8px;}
+  .opt{
+    background:none; border:1px solid var(--hair); color:var(--cream); width:100%;
+    font-family:var(--mono); font-size:16px; text-align:left; padding:15px 14px; line-height:1.4;
+  }
+  .opt:active{border-color:var(--cream);}
+  .opt:disabled{cursor:default;}
+  .opt.correct{background:var(--cream); color:#000; border-color:var(--cream); font-weight:600;}
+  .opt.wrong{border-color:var(--red); color:var(--red);}
+  .opt.dim{opacity:.4;}
+  .judge-banner{
+    margin-top:24px; padding:15px 12px 12px; text-align:center;
+    font-family:var(--disp); font-weight:600; font-size:24px; letter-spacing:.1em; text-transform:uppercase; line-height:1.2;
+  }
+  .judge-banner small{display:block; font-family:var(--mono); font-weight:400; font-size:12px; letter-spacing:.04em; text-transform:none; margin-top:6px;}
+  .judge-banner.right{background:var(--cream); color:#000;}
+  .judge-banner.right small{color:rgba(0,0,0,.65);}
+  .judge-banner.wrong{border:1px solid var(--red); color:var(--red);}
+  .judge-banner.wrong small{color:var(--cream-dim);}
+  .judge-banner.accent{border:1px solid var(--red); color:var(--cream);}
+  .judge-banner.accent b{color:var(--red); font-weight:600;}
+  .judge-banner.accent small{color:var(--cream-dim);}
+  .card .yours{margin-top:14px; font-size:14px; color:var(--cream-dim);}
+  .card .yours b{color:var(--red); font-weight:600;}
+  .next-btn{margin-top:20px;}
 
   .pass-note{
     margin-top:22px; border-top:1px solid var(--hair); padding-top:18px; text-align:center;
@@ -262,7 +299,7 @@
     <div id="deck-fr"></div>
     <div id="deck-pt"></div>
 
-    <p class="foot-note">A level is mastered only by a full pass with zero misses.<br/>Missed cards come back inside the same loop.</p>
+    <p class="foot-note">The app judges every answer — you type the word, or pick the meaning.<br/>A level is mastered only by a full pass with zero misses.</p>
   </section>
 
   <!-- ══════════ DRILL ══════════ -->
@@ -275,27 +312,43 @@
     <div class="counts">
       <div><div class="v" id="c-left">–</div><div class="k">Cards left</div></div>
       <div><div class="v" id="c-miss">0</div><div class="k">Misses this loop</div></div>
+      <div><div class="v" id="c-accent">0</div><div class="k">Accent misses</div></div>
       <div><div class="v" id="c-loop">1</div><div class="k">Loop</div></div>
       <div><div class="v" id="c-size">–</div><div class="k">In level</div></div>
     </div>
 
     <div id="drill-live">
-      <div class="card" id="card" role="button" tabindex="0" aria-label="Flashcard — tap to reveal the answer">
+      <div class="card" id="card">
         <div class="dir" id="card-dir">Recognition</div>
         <div class="front" id="card-front">—</div>
         <div class="hint" id="card-hint"></div>
+
+        <div class="answer-zone hidden" id="zone-prod">
+          <form id="prod-form" autocomplete="off">
+            <div class="type-row">
+              <input class="type-input" id="prod-input" type="text" placeholder="Type it here…"
+                     autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" />
+              <button class="check-btn" id="btn-check" type="submit">Check</button>
+            </div>
+          </form>
+          <div class="zone-note" id="prod-note"></div>
+        </div>
+
+        <div class="answer-zone hidden" id="zone-recog">
+          <div class="options" id="options"></div>
+        </div>
+
+        <div class="judge-banner hidden" id="judge-banner"></div>
+
         <div class="back hidden" id="card-back">
           <div class="answer" id="card-answer"></div>
           <div class="meaning" id="card-meaning"></div>
+          <div class="yours hidden" id="card-yours"></div>
           <div class="ex" id="card-ex"></div>
           <div class="gloss" id="card-gloss"></div>
         </div>
-        <div class="tap-note" id="tap-note">Tap the card to reveal</div>
       </div>
-      <div class="verdict hidden" id="verdict">
-        <button class="btn-knew" id="btn-knew">Knew it</button>
-        <button class="btn-missed" id="btn-missed">Missed <span>it</span></button>
-      </div>
+      <button class="plain-btn next-btn hidden" id="btn-next">Next card</button>
     </div>
 
     <div id="drill-end" class="hidden">
@@ -902,8 +955,8 @@ function startDrill(deckKey, lvl){
   S = {
     deck: deckKey, lvl: lvl,
     items: levelCards(deckKey, lvl),
-    pass: 0, queue: [], current: null, revealed: false,
-    passMisses: 0, seenThisPass: {}, finished: false
+    pass: 0, queue: [], current: null, judged: false,
+    passMisses: 0, passAccentMisses: 0, seenThisPass: {}, finished: false
   };
   var key = lvlKey(deckKey, lvl);
   if (!state.levels[key]) state.levels[key] = { attempts: 0, mastered: false };
@@ -918,6 +971,7 @@ function startDrill(deckKey, lvl){
 function startPass(){
   S.pass += 1;
   S.passMisses = 0;
+  S.passAccentMisses = 0;
   S.seenThisPass = {};
   var key = lvlKey(S.deck, S.lvl);
   state.levels[key].attempts += 1;
@@ -930,64 +984,165 @@ function startPass(){
 function nextCard(){
   if (!S.queue.length){ endPass(); return; }
   S.current = S.queue.shift();
-  S.revealed = false;
+  S.judged = false;
   renderCard();
 }
 function renderCounts(){
-  document.getElementById("c-left").textContent = S.queue.length + (S.current ? 1 : 0);
+  document.getElementById("c-left").textContent = S.queue.length + (S.current && !S.judged ? 1 : 0);
   document.getElementById("c-miss").textContent = S.passMisses;
+  document.getElementById("c-accent").textContent = S.passAccentMisses;
   document.getElementById("c-loop").textContent = S.pass;
   document.getElementById("c-size").textContent = S.items.length;
 }
+/* ════════════════ JUDGING ════════════════
+   Production: he types the word; the app judges it.
+   Case, stray spaces and apostrophe style are forgiven.
+   Accents are not: right word with a wrong or missing accent is
+   "Right word — wrong accent" and still counts as a miss.
+   Recognition: pick 1 of 4 English meanings; judged on the tap. */
+function normBase(str){
+  return String(str || "")
+    .toLowerCase()
+    .replace(/[’‘`´]/g, "'")
+    .replace(/[–—]/g, "-")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/'\s+/g, "'");
+}
+function stripAccents(str){
+  return String(str || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+function isAdjPair(card){ return card[0].indexOf("·") !== -1; }
+function expectedProduction(card){
+  if (isAdjPair(card)) return card[0].split("·")[0].trim(); /* masculine form */
+  return card[0];
+}
+function meaningHead(meaning){
+  return normBase(String(meaning || "").split("·")[0]);
+}
+
 function renderCard(){
   renderCounts();
   var c = S.current.card;
   var prod = S.current.dir === "prod";
   document.getElementById("card-dir").textContent =
-    prod ? "Production — say it " + DECKS[S.deck].langLabel : "Recognition — what does it mean?";
+    prod ? "Production — type it " + DECKS[S.deck].langLabel : "Recognition — pick the meaning";
   var front = document.getElementById("card-front");
   var hint = document.getElementById("card-hint");
+  document.getElementById("card-back").classList.add("hidden");
+  document.getElementById("judge-banner").classList.add("hidden");
+  document.getElementById("btn-next").classList.add("hidden");
+  document.getElementById("card-yours").classList.add("hidden");
   if (prod){
     front.textContent = c[1];
     front.classList.add("small");
-    hint.textContent = isNoun(c)
-      ? "Recall the word — with its article. The article is part of the answer."
-      : "Recall the word before you reveal.";
+    if (isAdjPair(c)){
+      hint.textContent = "Type the masculine form. Both forms are shown after the check.";
+      document.getElementById("prod-note").textContent = "Accents count — a right word with a wrong accent is a miss.";
+    } else if (isNoun(c)){
+      hint.textContent = "Type the word — with its article. The article is part of the answer.";
+      document.getElementById("prod-note").textContent = "Accents count — a right word with a wrong accent is a miss.";
+    } else {
+      hint.textContent = "Type the word, exactly as it is written.";
+      document.getElementById("prod-note").textContent = "Accents count — a right word with a wrong accent is a miss.";
+    }
+    document.getElementById("zone-recog").classList.add("hidden");
+    var zone = document.getElementById("zone-prod");
+    zone.classList.remove("hidden");
+    var input = document.getElementById("prod-input");
+    input.value = "";
+    input.disabled = false;
+    document.getElementById("btn-check").disabled = false;
+    setTimeout(function(){ try { input.focus({ preventScroll: true }); } catch(e){ input.focus(); } }, 60);
   } else {
     front.textContent = c[0];
     front.classList.remove("small");
-    hint.textContent = "Recall the English meaning before you reveal.";
+    hint.textContent = "Tap the English meaning that matches. The tap is the answer — it is judged at once.";
+    document.getElementById("zone-prod").classList.add("hidden");
+    document.getElementById("zone-recog").classList.remove("hidden");
+    buildOptions(c);
   }
-  document.getElementById("card-back").classList.add("hidden");
-  document.getElementById("verdict").classList.add("hidden");
-  document.getElementById("tap-note").classList.remove("hidden");
 }
-function reveal(){
-  if (!S || S.revealed || !S.current) return;
-  S.revealed = true;
+function buildOptions(card){
+  var host = document.getElementById("options");
+  host.innerHTML = "";
+  var correctHead = meaningHead(card[1]);
+  var used = {};
+  used[normBase(card[1])] = true;
+  function tryPool(pool){
+    var picks = [];
+    var shuffled = shuffle(pool.slice());
+    for (var i = 0; i < shuffled.length && picks.length < 3; i++){
+      var cand = shuffled[i].card;
+      if (cand === card) continue;
+      var m = normBase(cand[1]);
+      if (!m || used[m]) continue;
+      var head = meaningHead(cand[1]);
+      if (head === correctHead || head.indexOf(correctHead) === 0 || correctHead.indexOf(head) === 0) continue;
+      used[m] = true;
+      picks.push(cand[1]);
+    }
+    return picks;
+  }
+  var distractors = tryPool(S.items); /* prefer the same level */
+  if (distractors.length < 3){
+    var all = deckCards(S.deck).map(function(cd){ return { card: cd }; });
+    var more = tryPool(all);
+    for (var j = 0; j < more.length && distractors.length < 3; j++) distractors.push(more[j]);
+  }
+  var opts = [{ text: card[1], right: true }];
+  distractors.forEach(function(t){ opts.push({ text: t, right: false }); });
+  shuffle(opts);
+  opts.forEach(function(o){
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "opt";
+    b.textContent = o.text;
+    b.addEventListener("click", function(){ judgeRecognition(b, o.right, o.text); });
+    host.appendChild(b);
+  });
+}
+function judgeProduction(){
+  if (!S || S.judged || !S.current) return;
+  var input = document.getElementById("prod-input");
+  var typed = input.value;
+  if (!normBase(typed)) return; /* empty — nothing to judge yet */
+  var c = S.current.card;
+  var expected = expectedProduction(c);
+  var t = normBase(typed), e = normBase(expected);
+  if (t === e){
+    showJudgement("right", "Exact. The app marks it right.", typed);
+  } else if (stripAccents(t) === stripAccents(e)){
+    showJudgement("accent", "Right word — wrong accent. It counts as a miss: clean production is the standard.", typed);
+  } else {
+    var expBare = e.indexOf(" ") !== -1 ? e.split(" ").slice(1).join(" ") : e;
+    var typedBare = t.indexOf(" ") !== -1 ? t.split(" ").slice(1).join(" ") : t;
+    var articleMiss = isNoun(c) && expBare === typedBare && t !== e;
+    showJudgement("wrong", articleMiss
+      ? "The word is there, but the article is wrong or missing — the article is part of the answer."
+      : "Not the word. The correct answer is below.", typed);
+  }
+}
+function judgeRecognition(btn, right, text){
+  if (!S || S.judged || !S.current) return;
+  var buttons = document.querySelectorAll("#options .opt");
+  buttons.forEach(function(b){
+    b.disabled = true;
+    if (b.textContent === S.current.card[1]) b.classList.add("correct");
+    else if (b === btn) b.classList.add("wrong");
+    else b.classList.add("dim");
+  });
+  showJudgement(right ? "right" : "wrong",
+    right ? "Exact. The app marks it right." : "Not that one. The right meaning is lit up above.", text);
+}
+function showJudgement(kind, detail, yoursText){
+  if (!S || S.judged || !S.current) return;
+  S.judged = true;
+  var knew = kind === "right";
   var c = S.current.card;
   var prod = S.current.dir === "prod";
-  var ans = document.getElementById("card-answer");
-  var mean = document.getElementById("card-meaning");
-  if (prod){
-    ans.innerHTML = "";
-    ans.textContent = c[0];
-    mean.textContent = c[1];
-  } else {
-    ans.textContent = c[1];
-    mean.textContent = c[0];
-    mean.style.color = "var(--cream-dim)";
-    mean.style.fontSize = "15px";
-  }
-  if (prod){ mean.style.color = ""; mean.style.fontSize = ""; }
-  document.getElementById("card-ex").textContent = c[2] || "";
-  document.getElementById("card-gloss").textContent = c[3] || "";
-  document.getElementById("card-back").classList.remove("hidden");
-  document.getElementById("verdict").classList.remove("hidden");
-  document.getElementById("tap-note").classList.add("hidden");
-}
-function answer(knew){
-  if (!S || !S.revealed || !S.current) return;
+
+  /* record the verdict — this is the old answer(), now fed by the judge */
   var cur = S.current;
   var ck = S.deck + "-" + cur.idx;
   if (!state.cards[ck]) state.cards[ck] = { firstTry: null, seen: 0, miss: 0 };
@@ -999,12 +1154,69 @@ function answer(knew){
     if (!knew){
       rec.miss += 1;
       S.passMisses += 1;
+      if (kind === "accent") S.passAccentMisses += 1;
       requeue(cur);
     }
   } else {
-    if (!knew){ rec.miss += 1; requeue(cur); }
+    if (!knew){
+      rec.miss += 1;
+      if (kind === "accent") S.passAccentMisses += 1;
+      requeue(cur);
+    }
   }
   save();
+  renderCounts();
+
+  /* lock the answering controls */
+  var input = document.getElementById("prod-input");
+  if (input) input.disabled = true;
+  document.getElementById("btn-check").disabled = true;
+
+  /* verdict banner */
+  var banner = document.getElementById("judge-banner");
+  banner.className = "judge-banner " + kind;
+  if (kind === "right") banner.innerHTML = "✓ Right";
+  else if (kind === "accent") banner.innerHTML = "Right word — <b>wrong accent</b>";
+  else banner.innerHTML = "✗ Wrong";
+  var small = document.createElement("small");
+  small.textContent = detail;
+  banner.appendChild(small);
+  banner.classList.remove("hidden");
+
+  /* the card still teaches: correct answer + example, right or wrong */
+  var ans = document.getElementById("card-answer");
+  var mean = document.getElementById("card-meaning");
+  if (prod){
+    ans.innerHTML = "";
+    ans.textContent = c[0];
+    mean.textContent = c[1];
+    mean.style.color = ""; mean.style.fontSize = "";
+  } else {
+    ans.textContent = c[1];
+    mean.textContent = c[0];
+    mean.style.color = "var(--cream-dim)";
+    mean.style.fontSize = "15px";
+  }
+  var yours = document.getElementById("card-yours");
+  if (!knew && yoursText){
+    yours.innerHTML = "";
+    yours.appendChild(document.createTextNode("You answered: "));
+    var b = document.createElement("b");
+    b.textContent = yoursText;
+    yours.appendChild(b);
+    yours.classList.remove("hidden");
+  }
+  document.getElementById("card-ex").textContent = c[2] || "";
+  document.getElementById("card-gloss").textContent = c[3] || "";
+  document.getElementById("card-back").classList.remove("hidden");
+
+  var nextBtn = document.getElementById("btn-next");
+  nextBtn.textContent = S.queue.length ? "Next card" : "Finish this loop";
+  nextBtn.classList.remove("hidden");
+  try { nextBtn.focus({ preventScroll: true }); } catch(e){}
+}
+function advance(){
+  if (!S || !S.judged) return;
   S.current = null;
   nextCard();
 }
@@ -1036,7 +1248,9 @@ function endPass(){
   } else {
     title.textContent = "Loop " + S.pass + " — not clean yet";
     text.textContent = S.passMisses + (S.passMisses === 1 ? " miss" : " misses") +
-      " this loop. The rule: a full pass with zero misses masters the level. Run the whole level again.";
+      " this loop" +
+      (S.passAccentMisses ? ", " + S.passAccentMisses + (S.passAccentMisses === 1 ? " of them an accent miss" : " of them accent misses") + " — right word, wrong accent still counts" : "") +
+      ". The rule: a full pass with zero misses masters the level. Run the whole level again.";
     primary.textContent = "Run Level " + (S.lvl + 1) + " again";
     primary.onclick = function(){
       document.getElementById("drill-end").classList.add("hidden");
@@ -1068,12 +1282,11 @@ function renderSettings(){
 }
 
 /* ════════════════ WIRING ════════════════ */
-document.getElementById("card").addEventListener("click", reveal);
-document.getElementById("card").addEventListener("keydown", function(ev){
-  if (ev.key === "Enter" || ev.key === " "){ ev.preventDefault(); reveal(); }
+document.getElementById("prod-form").addEventListener("submit", function(ev){
+  ev.preventDefault();
+  judgeProduction();
 });
-document.getElementById("btn-knew").addEventListener("click", function(){ answer(true); });
-document.getElementById("btn-missed").addEventListener("click", function(){ answer(false); });
+document.getElementById("btn-next").addEventListener("click", advance);
 document.getElementById("drill-quit").addEventListener("click", function(){ S = null; show("home"); });
 document.getElementById("end-home").addEventListener("click", function(){ S = null; show("home"); });
 document.getElementById("nav-add").addEventListener("click", function(){ show("add"); });
