@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="color-scheme" content="dark" />
-<meta name="theme-color" content="#000000" />
+<meta name="theme-color" content="#0c1424" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black" />
@@ -13,20 +13,20 @@
 <title>Flashcards</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500;1,600&family=IBM+Plex+Mono:wght@400;500;600&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500;1,600&family=IBM+Plex+Mono:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet" />
 <style>
   :root{
-    --black:#000000;
-    --cream:#F2EDE3;
-    --cream-dim:rgba(242,237,227,.55);
-    --cream-faint:rgba(242,237,227,.32);
-    --hair:rgba(242,237,227,.16);
-    --hair-soft:rgba(242,237,227,.09);
-    --red:#C8102E;
-    --ox1:#6E1420;
-    --ox2:#9E1B30;
+    --black:#0c1424;
+    --cream:#f4efe6;
+    --cream-dim:rgba(244,239,230,.58);
+    --cream-faint:rgba(244,239,230,.38);
+    --hair:#31405c;
+    --hair-soft:#1d2c47;
+    --red:#d8b878;
+    --ox1:#8a6d35;
+    --ox2:#d8b878;
     --mono:'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-    --disp:'Oswald', 'Arial Narrow', sans-serif;
+    --disp:'Playfair Display', Georgia, serif;
     --serif:'Cormorant Garamond', Georgia, serif;
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
@@ -97,8 +97,8 @@
   .lvl.locked{color:var(--cream-faint);}
   .lvl.locked .n{opacity:.38;}
   .lvl.current .n{color:var(--red);}
-  .lvl.mastered{background:var(--cream); color:#000;}
-  .lvl.mastered .c{color:rgba(0,0,0,.55);}
+  .lvl.mastered{background:var(--cream); color:#0c1424;}
+  .lvl.mastered .c{color:rgba(12,20,36,.55);}
   .lvl.mastered::after{
     content:""; position:absolute; top:6px; right:7px; width:7px; height:7px;
     border-radius:50%; background:var(--red);
@@ -106,11 +106,11 @@
   .lvl:not(.locked):active{opacity:.75;}
 
   .drill-btn{
-    width:100%; margin-top:22px; background:var(--cream); color:#000; border:none;
+    width:100%; margin-top:22px; background:var(--cream); color:#0c1424; border:none;
     font-family:var(--disp); font-weight:600; font-size:24px; letter-spacing:.14em;
     text-transform:uppercase; padding:19px 10px 16px;
   }
-  .drill-btn small{display:block; font-family:var(--mono); font-weight:400; font-size:11px; letter-spacing:.16em; margin-top:5px; color:rgba(0,0,0,.6); text-transform:uppercase;}
+  .drill-btn small{display:block; font-family:var(--mono); font-weight:400; font-size:11px; letter-spacing:.16em; margin-top:5px; color:rgba(12,20,36,.6); text-transform:uppercase;}
   .drill-btn:active{opacity:.85;}
   .deck-done{
     margin-top:22px; border-top:1px solid var(--hair); padding-top:14px;
@@ -241,7 +241,7 @@
   .type-input:focus{outline:none; border-bottom-color:var(--cream);}
   .type-input:disabled{opacity:.55;}
   .check-btn{
-    background:var(--cream); color:#000; border:none; flex-shrink:0;
+    background:var(--cream); color:#0c1424; border:none; flex-shrink:0;
     font-family:var(--disp); font-weight:600; font-size:19px; letter-spacing:.12em;
     text-transform:uppercase; padding:12px 20px 9px;
   }
@@ -255,7 +255,7 @@
   }
   .opt:active{border-color:var(--cream);}
   .opt:disabled{cursor:default;}
-  .opt.correct{background:var(--cream); color:#000; border-color:var(--cream); font-weight:600;}
+  .opt.correct{background:var(--cream); color:#0c1424; border-color:var(--cream); font-weight:600;}
   .opt.wrong{border-color:var(--red); color:var(--red);}
   .opt.dim{opacity:.4;}
   .judge-banner{
@@ -263,8 +263,8 @@
     font-family:var(--disp); font-weight:600; font-size:24px; letter-spacing:.1em; text-transform:uppercase; line-height:1.2;
   }
   .judge-banner small{display:block; font-family:var(--mono); font-weight:400; font-size:12px; letter-spacing:.04em; text-transform:none; margin-top:6px;}
-  .judge-banner.right{background:var(--cream); color:#000;}
-  .judge-banner.right small{color:rgba(0,0,0,.65);}
+  .judge-banner.right{background:var(--cream); color:#0c1424;}
+  .judge-banner.right small{color:rgba(12,20,36,.65);}
   .judge-banner.wrong{border:1px solid var(--red); color:var(--red);}
   .judge-banner.wrong small{color:var(--cream-dim);}
   .judge-banner.accent{border:1px solid var(--red); color:var(--cream);}
@@ -280,7 +280,7 @@
   .pass-note .big{font-family:var(--disp); font-size:30px; font-weight:600; text-transform:uppercase;}
   .pass-note p{color:var(--cream-dim); font-size:13px; margin:10px 0 18px;}
   .plain-btn{
-    background:var(--cream); color:#000; border:none; width:100%;
+    background:var(--cream); color:#0c1424; border:none; width:100%;
     font-family:var(--disp); font-weight:600; font-size:20px; letter-spacing:.12em;
     text-transform:uppercase; padding:17px 10px 14px;
   }
@@ -314,7 +314,7 @@
   .confirm-box p{color:var(--cream); margin:0 0 14px;}
   .confirm-box .row{display:flex; gap:10px;}
   .confirm-box button{flex:1; padding:14px 6px; font-size:12px; letter-spacing:.14em; text-transform:uppercase;}
-  .confirm-box .yes{background:var(--red); color:#fff; border:none; font-weight:600;}
+  .confirm-box .yes{background:var(--red); color:#0c1424; border:none; font-weight:600;}
   .confirm-box .no{background:none; color:var(--cream-dim); border:1px solid var(--hair);}
 
   .foot-note{
@@ -349,24 +349,24 @@
 
     <div class="bouquet" aria-hidden="true">
       <svg width="86" height="40" viewBox="0 0 86 40" fill="none">
-        <g stroke="#F2EDE3" stroke-opacity=".45" stroke-width="1">
-          <circle cx="14" cy="12" r="5" fill="#0a0a0a"/><circle cx="23" cy="12" r="5" fill="#0a0a0a"/>
-          <circle cx="18.5" cy="6" r="5" fill="#0a0a0a"/><circle cx="18.5" cy="18" r="5" fill="#0a0a0a"/>
+        <g stroke="#f4efe6" stroke-opacity=".45" stroke-width="1">
+          <circle cx="14" cy="12" r="5" fill="#05080f"/><circle cx="23" cy="12" r="5" fill="#05080f"/>
+          <circle cx="18.5" cy="6" r="5" fill="#05080f"/><circle cx="18.5" cy="18" r="5" fill="#05080f"/>
         </g>
-        <circle cx="18.5" cy="12" r="2.2" fill="#F2EDE3" fill-opacity=".5"/>
-        <path d="M18.5 22 L18.5 38" stroke="#F2EDE3" stroke-opacity=".35"/>
-        <g fill="#C8102E">
+        <circle cx="18.5" cy="12" r="2.2" fill="#f4efe6" fill-opacity=".5"/>
+        <path d="M18.5 22 L18.5 38" stroke="#f4efe6" stroke-opacity=".35"/>
+        <g fill="#d8b878">
           <circle cx="36" cy="11" r="3.4"/><circle cx="43" cy="6.5" r="3.4"/><circle cx="50" cy="11" r="3.4"/>
           <circle cx="39.5" cy="16.5" r="3.4"/><circle cx="46.5" cy="16.5" r="3.4"/>
         </g>
-        <circle cx="43" cy="11.5" r="2.4" fill="#6E1420"/>
-        <path d="M43 20 L43 38" stroke="#C8102E" stroke-opacity=".6"/>
-        <g stroke="#F2EDE3" stroke-opacity=".45" stroke-width="1">
-          <circle cx="63" cy="12" r="5" fill="#0a0a0a"/><circle cx="72" cy="12" r="5" fill="#0a0a0a"/>
-          <circle cx="67.5" cy="6" r="5" fill="#0a0a0a"/><circle cx="67.5" cy="18" r="5" fill="#0a0a0a"/>
+        <circle cx="43" cy="11.5" r="2.4" fill="#8a6d35"/>
+        <path d="M43 20 L43 38" stroke="#d8b878" stroke-opacity=".6"/>
+        <g stroke="#f4efe6" stroke-opacity=".45" stroke-width="1">
+          <circle cx="63" cy="12" r="5" fill="#05080f"/><circle cx="72" cy="12" r="5" fill="#05080f"/>
+          <circle cx="67.5" cy="6" r="5" fill="#05080f"/><circle cx="67.5" cy="18" r="5" fill="#05080f"/>
         </g>
-        <circle cx="67.5" cy="12" r="2.2" fill="#F2EDE3" fill-opacity=".5"/>
-        <path d="M67.5 22 L67.5 38" stroke="#F2EDE3" stroke-opacity=".35"/>
+        <circle cx="67.5" cy="12" r="2.2" fill="#f4efe6" fill-opacity=".5"/>
+        <path d="M67.5 22 L67.5 38" stroke="#f4efe6" stroke-opacity=".35"/>
       </svg>
     </div>
     <p class="motto">Petit à petit, l'oiseau fait son nid</p>
